@@ -3,6 +3,11 @@ body {
 	font-size: 12px;
 }
 
+header {
+	background: #888;
+	height: 200px;
+}
+
 form, fieldset {
 	border: 0px;
 	width: 200px;

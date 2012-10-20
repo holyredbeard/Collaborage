@@ -21,6 +21,8 @@ session_start();
     require_once ('Controller/LoginController.php');
     require_once ('Controller/UserController.php');
     require_once ('Controller/ListController.php');
+    require_once ('Controller/HeaderController.php');
+    //require_once ('Controller/FooterController.php');
 
     // Common
     require_once ('Common/PageView.php');
@@ -51,6 +53,7 @@ session_start();
             $loginController = new \Controller\LoginController();
             $userController = new \Controller\UserController();
             $listController = new \Controller\ListController();
+            $headerController = new \Controller\HeaderController();
 
             if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
                 $body .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler);
@@ -71,12 +74,12 @@ session_start();
             //Close the database since it is no longer used
             $db->Close();
 
-            $header = new \Common\PageHeader();
-            //$footer = new \Common\PageFooter();
+            $header = $headerController->DoControl();
+            //$footer = new \Controller\FooterController();
             
             //Generate output
             $pageView = new \Common\PageView();
-            return $pageView->GetHTMLPage("Title", $body);
+            return $pageView->GetHTMLPage("Title", $header, $body);
         }
     }
 
