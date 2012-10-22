@@ -15,6 +15,7 @@ session_start();
   	require_once ('View/RegisterView.php');
     require_once ('View/LoginView.php');
     require_once ('View/UserView.php');
+    require_once ('View/URLQueryView.php');
 
     // Controllers
     require_once ('Controller/RegisterController.php');
@@ -36,6 +37,8 @@ session_start();
 
         public static function DoControl(){
 
+            $reqAction = null;
+
             $db = new \Model\Database();
             $db->Connect(new \Model\DBConfig());
 
@@ -43,6 +46,7 @@ session_start();
             $registerView = new \View\RegisterView();
             $loginView = new \View\LoginView();
             $userView = new \View\UserView();
+            $URLQueryView = new \View\URLQueryView();
             
             $registerHandler = new \Model\RegisterHandler($db);
             $loginHandler = new \Model\LoginHandler($db);
@@ -64,11 +68,16 @@ session_start();
 
             if ($loginHandler->IsLoggedIn()){
 
-                $body .= $listController->DoControl($db);
+                $actionType = $URLQueryView->GetType();
 
-                // Nedan är för administrationsvyn!
+                if ($actionType == 'list'){
+                    $body .= $listController->DoControl($loginHandler, $db, $URLQueryView);
+                }
+                else if ($actiontype == 'admin') {
+                    $body .= $userController->DoControl($userHandler, $userView);
+                }
+
                 // TODO: Ändra namn på filerna till AdminView etc...
-                //$body .= $userController->DoControl($userHandler, $userView);
             }
 
             //Close the database since it is no longer used

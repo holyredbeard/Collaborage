@@ -10,6 +10,71 @@ class ListHandler {
 		$this->m_db = $db;
 	}
 
+	public function GetAllLists($listView) {
+
+		$query = "SELECT listId, listName, isPublic FROM list";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$lists = $this->m_db->GetAllLists($stmt);
+
+		return $lists;
+	}
+
+	public function SaveNewList($list) {
+
+		// TODO: Lägg till desc!!!
+
+
+		$query = "INSERT INTO list (userId, listName, creationDate, expireDate, isPublic) VALUES(?, ?, ?, ?, ?)";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param("isssi", $list['userId'],
+								   $list['listName'],
+								   $list['creationDate'],
+								   $list['expireDate'],
+								   $list['isPublic']);
+
+		$listId = $this->m_db->CreateNewList($stmt);
+
+		$objectsAdded = $this->InsertListObjects($listId, $list['listObjects']);
+
+		if ($isPublic == false) {
+			$this->InsertListUsers($listId, $list['checkedUsers']);
+		}
+
+		$list['listId'] = $listId;
+
+		return $list;
+	}
+
+	public function InsertListObjects($listId, $listObjects) {
+
+		foreach ($listObjects as $listObject) {
+			$query = "INSERT INTO listElement (listElemName, listId) VALUES(?, ?)";
+
+			$stmt = $this->m_db->Prepare($query);
+
+			$stmt->bind_param('si', $listObject, $listId);
+
+			$ret = $this->m_db->RunInsertQuery($stmt);
+		}
+	}
+
+	public function InsertListUsers($listId, $checkedUsers) {
+
+		foreach ($checkedUsers as $checkedUser) {
+			$query = "INSERT INTO listUser (listId, userId) VALUES(?, ?)";
+
+			$stmt = $this->m_db->Prepare($query);
+
+			$stmt->bind_param('ii', $listId, $checkedUser);
+
+			$this->m_db->RunInsertQuery($stmt);
+		}
+	}
+
 	public function ChangeListOrder($listId) {
 		// TODO: Implement function!
 
@@ -18,13 +83,25 @@ class ListHandler {
 		$output = $listView->ShowList;*/
 	}
 
-	public function AddNewList() {
-		// TODO: Implement function!
+	public function ShowList($listId, $listView) {
+
+		$listOptions = $this->GetListOptions($listId);		// : Array
+
+		$listElements = $this->GetListElements($listId);		// : Array
+		$listUsers = $this->GetListUsers($listId);			// : Var
+
+		$list = array('listId' => $listId,
+					  'listOptions' => $listOptions,
+					  'listElements' => $listElements,
+					  'listUsers' => $listUsers);
+
+		$output = $listView->ShowList($list);
+
+		return $output;
 	}
 
 	// KLAR!
 	public function GetListOptions($listId) {
-		$listId = 1;	// Detta ska bort så småningom
 		
 		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, .l.expireDate, l.isPublic, u.username
 					FROM list AS l
@@ -46,7 +123,7 @@ class ListHandler {
 		
 		$query = "SELECT le.listElemId, le.listElemName, le.listElemOrderPlace, led.listElemDesc
 					FROM listElement AS le
-					INNER JOIN listElemDesc as led
+					LEFT JOIN listElemDesc as led
 					ON le.listElemId = led.listElemId
 					WHERE le.listId=?";
 
@@ -62,8 +139,8 @@ class ListHandler {
 	// KLAR!
 	public function GetListUsers($listId) {
 
-		$query = "SELECT lu.userId, u.username, lu.isFinished
-					FROM listUsers AS lu
+		$query = "SELECT lu.userId, u.username, lu.hasStarted, lu.isFinished
+					FROM listUser AS lu
 					INNER JOIN user as u
 					ON lu.userId = u.userId
 					WHERE lu.listId=?";

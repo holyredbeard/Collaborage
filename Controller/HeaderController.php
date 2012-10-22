@@ -10,9 +10,9 @@ class HeaderController {
 
 		$headerView = new \View\HeaderView();
 
-		$header = $headerView->GetMenu();
+		$menu = $headerView->GetMenu();
 
-
+		$header = "<div id='logo'>Collaborage</div> $menu";
 
 		return $header;
 	}

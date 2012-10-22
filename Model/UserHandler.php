@@ -18,28 +18,18 @@ class UserHandler {
 	 * @return Array
 	 */
 	public function GetAllUsers() {
-$listId = 1;
+		
 		// TODO: Implement database query!
 		// Arrayen innehåller:
 		// listId, userId, listName, creationDate, expireDate, isPublic
 		// hämtar ut användarnamnet till listskaparen i en annan funktion.
 		// 
-		$query = 'SELECT * FROM Users';
+		$query = 'SELECT * FROM user';
 		$stmt = $this->m_db->Prepare($query);
-
-		$stmt->bind_param("i", $listId);
 		
-		$listOptions = $this->m_db->GetUsers($stmt);
+		$users = $this->m_db->GetUsers($stmt);
 
-		/*$listOptions = array('listId' => 2,
-							 'userId' => 3,
-							 'listName' => 'FirstList',
-							 'creationDate' => '2012-08-05',
-							 'expireDate' =>
-							 '2012-10-20',
-							 'isPublic' => true);*/
-
-		return $listOptions;
+		return $users;
 	}
 
 

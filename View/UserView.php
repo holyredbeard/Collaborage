@@ -25,6 +25,7 @@ class UserView {
      */
 	public function ShowUsers(Array $userArray) {
 
+		// TODO: Fixa med denna array så att det blir en associativ
 		$userIdArray = $userArray[0];
 		$userNameArray = $userArray[1];
 		$usersToInclude = implode(",", $userNameArray);

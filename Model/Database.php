@@ -61,7 +61,6 @@ class Database {
         return false;
     }
 
-
     /**
      * Körs för att kontrollera om användarnamnet finns registrerat sedan tidigare
      * @param $stmt mysqli_stmt
@@ -72,16 +71,18 @@ class Database {
         if ($stmt->execute() == false) {
             throw new \Exception($this->mysqli->error);
         }
-        $ret = 0;   
         
-        if ($stmt->bind_result($field1, $field2, $field3) == FALSE) {
+        if ($stmt->bind_result($userId, $username, $password) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
 
         if ($stmt->fetch()) {
-            return true;        // Match i databasen
+
+            $user = array('userId' => $userId, 'username' => $username);
+
+            return $user;
         } else {
-            return false;       // Ingen match i databasen
+            return null;       // Ingen match i databasen
         }
     }
 
@@ -141,6 +142,52 @@ class Database {
         $stmt->Close();
         
         return $userArray;
+    }
+
+    /*
+    
+        LIST DATABASE FUNCTIONS
+
+     */
+    
+    public function GetAllLists($stmt) {
+        
+        $lists = array();
+
+        if ($stmt === FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($listId, $listName, $isPublic) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            $lists = array('listIds' => $listId,
+                           'listName' => $listName,
+                           'isPublic' => $isPublic);
+        }
+        
+        $stmt->Close();
+
+        return $lists;
+    }
+    
+    public function CreateNewList($stmt) {
+
+        if ($stmt->execute() == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        return $stmt->insert_id;
+
     }
 
     public function GetListOptions(\mysqli_stmt $stmt) {
@@ -218,7 +265,7 @@ class Database {
         }
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($userId, $username, $isFinished) == FALSE) {
+        if ($stmt->bind_result($userId, $username, $hasStarted, $isFinished) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
 
@@ -227,6 +274,7 @@ class Database {
         while ($stmt->fetch()) {
             $listUsers[] = array('userId' => $userId,
                                  'username' => $username,
+                                 'hasStarted' => $hasStarted,
                                  'isFinished' => $isFinished);
         }
 

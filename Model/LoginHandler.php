@@ -7,8 +7,9 @@ session_start();
 class LoginHandler {
 
 	// Privat variabel för hantering av session.
-	private $checkLoginState = 'login_session';
-	private $sessionCheck = "isLoggedIn";
+	private $m_checkLoginState = 'login_session';
+	private $m_sessionCheck = "isLoggedIn";
+	private $m_storedUser;
 
 	private $m_db = null;
 
@@ -21,12 +22,23 @@ class LoginHandler {
 	 * @return boolean
 	 */
 	public function IsLoggedIn() {
-		if($_SESSION[$this->checkLoginState] == $this->sessionCheck) {
+		if($_SESSION[$this->m_checkLoginState] == $this->m_sessionCheck) {
 			return true;
 		}
 		else {
 			return false;
 		}
+	}
+
+	public function GetStoredUser() {
+		if(isset($_SESSION[$this->m_storedUser])) {
+			echo 'finns';
+			return $_SESSION[$this->m_storedUser];
+		}
+		else {
+			echo 'finns ej';
+		}
+		//return isset($_SESSION[$this->m_storedUser]) ? $_SESSION[$this->m_storedUser] : false;
 	}
 
 	/**
@@ -43,12 +55,13 @@ class LoginHandler {
 
 		$stmt->bind_param("ss", $username, $password);
 		
-		$ret = $this->m_db->CheckUser($stmt);
+		$user = $this->m_db->CheckUser($stmt);
 		
 		$stmt->close();
 
-		if ($ret){
-			$_SESSION[$this->checkLoginState] = $this->sessionCheck;
+		if ($user != null){
+			$_SESSION[$this->m_checkLoginState] = $this->m_sessionCheck;
+			$_SESSION[$this->m_storedUser] = $user;
 		}
 
 		return $ret;
@@ -60,8 +73,8 @@ class LoginHandler {
 	 * @param Object $loginView instans av LoginView()
 	 */
 	public function DoLogout(\View\LoginView $loginView){
-		if (isset($_SESSION[$this->checkLoginState])){
-			unset($_SESSION[$this->checkLoginState]);
+		if (isset($_SESSION[$this->m_checkLoginState])){
+			unset($_SESSION[$this->m_checkLoginState]);
 
 			// Kör funktionen DeleteCookie för att ta bort kakorna.
 			$loginView->DeleteCookie();

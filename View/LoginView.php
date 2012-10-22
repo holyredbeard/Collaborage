@@ -48,7 +48,7 @@ class LoginView {
      * @return String,  HTML
      */
 	public function DoLogoutBox() {
-		return "<div id='logoutButton'>
+		return "<div id='logout'>
                     <form method='post' action=''>
     					<input type='submit' id='$this->_logoutButton' name='$this->_logoutButton' value='Logout' />
     				</form>
