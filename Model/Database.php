@@ -150,33 +150,67 @@ class Database {
 
      */
     
-    public function GetAllLists($stmt) {
+    public function GetAllPublicLists($stmt) {
         
-        $lists = array();
-
         if ($stmt === FALSE) {
-            throw new \Exception($this->mysqli->error);
+                throw new \Exception($this->mysqli->error);
         }
-
+        
         //execute the statement
         if ($stmt->execute() == FALSE) {
-            throw new \Exception($this->mysqli->error);
+                throw new \Exception($this->mysqli->error);
         }
-
+        $ret = 0;
+            
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $listName, $isPublic) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $isPublic) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
-
+        
         // Hämtar ids och användarnamn och lägger i arrayen.
         while ($stmt->fetch()) {
-            $lists = array('listIds' => $listId,
+            $lists[] = array('listId' => $listId,
+                           'userId' => $userId,
                            'listName' => $listName,
+                           'creationDate' => $creationDate,
+                           'expireDate' => $expireDate,
                            'isPublic' => $isPublic);
         }
         
         $stmt->Close();
+        
+        return $lists;
+    }
 
+    public function GetAssignedLists($stmt) {
+        
+        if ($stmt === FALSE) {
+                throw new \Exception($this->mysqli->error);
+        }
+        
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+                throw new \Exception($this->mysqli->error);
+        }
+        $ret = 0;
+            
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $isPublic) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            $lists[] = array('listId' => $listId,
+                           'userId' => $userId,
+                           'listName' => $listName,
+                           'creationDate' => $creationDate,
+                           'expireDate' => $expireDate,
+                           'isPublic' => $isPublic);
+        }
+        
+        $stmt->Close();
+        
         return $lists;
     }
     

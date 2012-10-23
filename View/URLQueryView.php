@@ -37,4 +37,12 @@ class URLQueryView {
 
 		return $userId;	
 	}
+
+	public function GetListOrder() {
+		if (isset($_GET['listOrder'])) {
+			$userId = $_GET['listOrder'];
+		}
+
+		return $userId;	
+	}
 }

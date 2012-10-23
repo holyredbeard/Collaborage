@@ -12,14 +12,45 @@ class ListHandler {
 
 	public function GetAllLists($listView) {
 
-		$query = "SELECT listId, listName, isPublic FROM list";
+		$query = "SELECT * FROM list";
 
 		$stmt = $this->m_db->Prepare($query);
 
-		$lists = $this->m_db->GetAllLists($stmt);
+		$lists = $this->m_db->GetLists($stmt);
 
 		return $lists;
 	}
+
+	public function GetAllPublicLists() {
+
+		$query = "SELECT * FROM list
+					WHERE isPublic=1";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$publicLists = $this->m_db->GetAllPublicLists($stmt);
+
+		return $publicLists;
+	}
+	
+
+	public function GetAssignedLists($userId) {
+
+		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, l.expireDate, l.isPublic
+					FROM list AS l
+	                INNER JOIN listUser AS lu
+	                ON l.listId = lu.listId
+	                WHERE lu.userId = ?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param("i", $userId);
+
+		$assignedLists = $this->m_db->GetAssignedLists($stmt);
+
+		return $assignedLists;
+	}
+
 
 	public function SaveNewList($list) {
 

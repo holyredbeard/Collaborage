@@ -14,37 +14,64 @@ class ListController {
 		$userHandler = new \Model\UserHandler($db);
 		$loginHandler = new \Model\loginHandler($db);
 
-		if ($listView->WantToCreateList()) {
-			$list = $listView->GetNewList($loginHandler);
+		$user = $loginHandler->GetStoredUser();
 
-			$list = $listHandler->SaveNewList($list);
-
-			$output = $listHandler->ShowList($list['listId'], $listView);
+		if ($listView->WantToSaveNewOrderedList()){
+			echo 'yes2';
+		} else {
+			echo 'nej';
 		}
-		else {
 
-			$action = $URLQueryView->GetAction();
+		$action = $URLQueryView->GetAction();
 
-			switch ($action) {
-				case 'newList':
+		switch ($action) {
+			case 'newList':
+				if ($listView->WantToCreateList()) {
+					$list = $listView->GetNewList($loginHandler, $user);
+
+					$list = $listHandler->SaveNewList($list);
+
+					$output = $listHandler->ShowList($list['listId'], $listView);
+				}
+				else {
 					$users = $userHandler->GetAllUsers();
 					$output .= $listView->CreateListForm($users, $loginHandler);
+				}
 
-					break;
+				break;
 
-				case 'showLists':
-					echo 'hej';
-					$lists .= $listHandler->GetAllLists($listView);
-					var_dump($lists);
-					//$output.= $listView->ShowAllLists($lists);
+			case 'showLists':
+				//$lists = $listHandler->GetAllLists($listView);
+				//
+				$publicLists = $listHandler->GetAllPublicLists();
 
-					break;
+				$assignedLists = $listHandler->GetAssignedLists($user['userId']);
 
-				case 'viewList':
-					$output = $listHandler->ShowList(101, $listView);
+				$output .= $listView->ShowAllLists($publicLists, $assignedLists);
 
-					break;
-			}
+				break;
+
+			case 'showList':
+
+				$listId = $URLQueryView->GetListId();
+
+				$output .= $listHandler->ShowList($listId, $listView);
+
+				break;
+
+			case 'viewList':
+				$output .= $listHandler->ShowList(101, $listView);
+
+				break;
+
+			case 'saveNewListOrder':
+				$listOrder = $URLQueryView->GetListOrder();
+
+				$return = $listHandler->SaveListOrder();
+
+				echo $return;
+
+				break;
 		}
 
 		return $output;

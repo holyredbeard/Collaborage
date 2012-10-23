@@ -6,11 +6,11 @@ class HeaderView {
 	
 	public function GetMenu() {
 
-		$menu = "<ul>
-					<li><a href='index.php?type=list&action=newList'>Create list</a></li>
-    				<li><a href='index.php?type=list&action=viewList'>Lists</a></li>
-    				<li><a href='index.php?type=users&action=showLists'>People</a></li>
-    				<li><a href='index.php?type=admin&action=showUsers'>Admin</a></li>
+		$menu = "<ul class='menu'>
+					<li class='menu'><a href='index.php?type=list&action=newList'>Create list</a></li>
+    				<li class='menu'><a href='index.php?type=list&action=showLists'>Lists</a></li>
+    				<li class='menu'><a href='index.php?type=users&action=viewPeople'>People</a></li>
+    				<li class='menu'><a href='index.php?type=admin&action=showUsers'>Admin</a></li>
   				</ul>
   				<div class='clear'></div>";
 

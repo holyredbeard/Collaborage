@@ -20,6 +20,33 @@ class ListView {
 	private $m_newListObject5 = 'm_newListObject5';
 
 	private $m_newListSubmit = 'newListIsSubmit';
+	private $m_newOrderListSubmit = 'newOrderListSubmit';
+
+	public function ShowAllLists($publicLists, $assignedLists) {
+
+		function GenerateListHTML($lists) {
+
+			$j = 0;
+			foreach ($lists as $key) {
+				$listHTML .= "<strong>Name: </strong><a href='index.php?type=list&action=showList&listId=" . $lists[$j]['listId'] . "' />" . $lists[$j]['listName'] . "</a><br/>";
+
+				$j += 1;
+			}
+
+			return $listHTML;
+		}
+
+		$listHTML = "<div id='listContainer'><h3>Public lists</h3>";
+		$listHTML .= GenerateListHTML($publicLists);
+
+		$listHTML .= "<h3>Assigned lists</h3>";
+
+		$listHTML .= GenerateListHTML($assignedLists);
+
+		$listHTML .= "</div>";
+
+		return $listHTML;
+	}
 
 	public function ShowList($list) {
 		
@@ -54,10 +81,12 @@ class ListView {
 				$listElemDesc = $element['listElemDesc'];
 				//$orderPlace = $element['listElemOrderPlace'];
 
-				$showElements .= "<div id='listElement'>
-									<strong>$listElemName (Id: $listElemId)</strong><br>
-									$listElemDesc
-								</div>";
+				$showElements .= "<ul class='listObject'>";
+
+				$showElements .= "<li id='$listElemId' class='listObject'><strong>$listElemName</strong><br>
+										$listElemDesc</li>";
+				
+				$showElements .= "</ul>";
 			}
 
 			return $showElements;
@@ -92,6 +121,7 @@ class ListView {
 						<div id='listElements'>
 							$showElements
 						</div>
+						<div id='listElements2'></div>
 						<div id='listUsers'>
 							<p><hr></p>
 							<h3>Collaborators</h3>
@@ -103,8 +133,10 @@ class ListView {
 							<strong>Creation date:</strong> $creationDate<br/>
 							$showExpireDate
 							$isPublic
-						</div> 
+						</div>
+						<a href='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
 					 </div>";
+
 
 		return $listHTML;
 	}
@@ -113,8 +145,8 @@ class ListView {
 
 		$i = 0;
 		foreach ($users[0] as $key) {
+			$userId = $users[0][$i];
 			$userName = $users[1][$i];
-			$userId = $users[1][$i];
 			$generateUsers .= "$userName <input type='checkbox' name='$this->m_newListUser' value='$userId' /></br>";
 			$i += 1;
 		}
@@ -123,8 +155,8 @@ class ListView {
 							<form id='newListForm' method='post'>
 								<fieldset>
 									<label for='$this->m_newListName'><input type='text' name='$this->m_newListName' value='List name'/></label>
-									<label for='$this->m_newListExpireDate'><input type='text' name='m_newListExpireDate' value='Expire date'/></label>
-									<label for='$this->m_newListIsPublic'>Public<input type='checkbox' checked='checked' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' Value='True' /></label>
+									<label for='$this->m_newListExpireDate'><input type='text' id='datepicker' name='m_newListExpireDate' value='Expire date'/></label>
+									<p><label for='$this->m_newListIsPublic'>Public list <input type='checkbox' checked='checked' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' Value='True' /></label></p>
 									<h3>Add list objects</h3>
 									<label for='$this->m_newListObject1'><input type='text' name='$this->m_newListObject1' value=''/></label>
 									<label for='$this->m_newListObject2'><input type='text' name='$this->m_newListObject2' value=''/></label>
@@ -152,10 +184,19 @@ class ListView {
 		}
 	}
 
-	// TODO: Eventuellt en GET-funktion för varje fält... det är nog att föredra.
-	public function GetNewList($loginHandler) {
+	public function WantToSaveNewOrderedList() {
+		if (isset($_POST[$this->m_newOrderListSubmit])) {
+			return true;
+			echo 'yes';
+		}
+		else {
+			return false;
+		}
+	}
 
-		$user = $loginHandler->GetStoredUser();
+	// TODO: Eventuellt en GET-funktion för varje fält... det är nog att föredra.
+	public function GetNewList($loginHandler, $user) {
+
 		$userId = $user['userId'];
 
 		$listName = 'listName';
@@ -199,6 +240,7 @@ class ListView {
 
 			foreach($userCheckBoxes as $user) {
 	        	$checkedUsers[] = $user;
+	        	var_dump($checkedUsers);
 	    	}
 		}
 
@@ -211,6 +253,23 @@ class ListView {
 						 'userId' => $userId);
 
 		return $newList;
+	}
+
+	public function NewListSubmitted() {
+	// TODO: $this->m_submitNewForm
+		if (isset($_POST['submitButton'])) {
+			return true;
+		}
+		return false;
+	}
+
+	public function GetNewListOrder() {
+	// TODO: $this->m_formJson
+		if(isset($_POST['json'])) {
+			$json = $_POST['json']; // $json is a string
+			$person = json_decode($json); // $person is an array with a key 'name'
+			var_dump($person);
+		}
 	}
 
 	public function CreateUserList() {
