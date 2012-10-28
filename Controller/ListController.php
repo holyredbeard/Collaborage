@@ -8,7 +8,7 @@ require_once ('Model/ListHandler.php');
 class ListController {
 
 	
-	public function DoControl($loginHandler, $db, $URLQueryView) {
+	public function DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn) {
 		$listView = new \View\ListView();
 		$listHandler = new \Model\ListHandler($db);
 		$userHandler = new \Model\UserHandler($db);
@@ -16,26 +16,22 @@ class ListController {
 
 		$user = $loginHandler->GetStoredUser();
 
-		if ($listView->WantToSaveNewOrderedList()){
-			echo 'yes2';
-		} else {
-			echo 'nej';
-		}
-
 		$action = $URLQueryView->GetAction();
 
 		switch ($action) {
 			case 'newList':
-				if ($listView->WantToCreateList()) {
-					$list = $listView->GetNewList($loginHandler, $user);
+				if ($IsLoggedIn) {
+					if ($listView->WantToCreateList()) {
+						$list = $listView->GetNewList($loginHandler, $user);
 
-					$list = $listHandler->SaveNewList($list);
+						$list = $listHandler->SaveNewList($list);
 
-					$output = $listHandler->ShowList($list['listId'], $listView);
-				}
-				else {
-					$users = $userHandler->GetAllUsers();
-					$output .= $listView->CreateListForm($users, $loginHandler);
+						$output = $listHandler->ShowList($list['listId'], $listView, false, false);
+					}
+					else {
+						$users = $userHandler->GetAllUsers();
+						$output .= $listView->CreateListForm($users, $loginHandler);
+					}
 				}
 
 				break;
@@ -45,7 +41,12 @@ class ListController {
 				//
 				$publicLists = $listHandler->GetAllPublicLists();
 
-				$assignedLists = $listHandler->GetAssignedLists($user['userId']);
+				if ($IsLoggedIn) {
+					$assignedLists = $listHandler->GetAssignedLists($user['userId']);
+				}
+				else {
+					$assignedLists = null;
+				}
 
 				$output .= $listView->ShowAllLists($publicLists, $assignedLists);
 
@@ -55,7 +56,29 @@ class ListController {
 
 				$listId = $URLQueryView->GetListId();
 
-				$output .= $listHandler->ShowList($listId, $listView);
+				// TODO: Här måste det kollas VARJE enskild användare om de är klara, inte bara denna.
+				// Vidare om någon inte är klar visas den lista man senast skapade, låst.
+				// Om möjlighet ska finnas ska det här gå att låsa upp om man vill ändra
+
+				$isFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
+
+				// If not finished, let's sort the list!
+				if ($isFinished != false) {
+
+					$listUsers = $listHandler->GetListUsersIds($listId);
+
+					$listOrders = $listHandler->GetListOrders($listId, $listUsers);
+
+					$orderedList = $listHandler->CalculateOrder($listOrders);
+
+					$wasAdded = $listHandler->AddListElemOrderPlaces($orderedList);
+				}
+
+				// check if the list sorting is done
+				$listIsDone = $listHandler->CheckListStatus($listId);
+
+				// Show the list!
+				$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, $listIsDone);
 
 				break;
 
@@ -66,10 +89,14 @@ class ListController {
 
 			case 'saveNewListOrder':
 				$listOrder = $URLQueryView->GetListOrder();
+				$listId = $URLQueryView->GetListId();
 
-				$return = $listHandler->SaveListOrder();
+				$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
 
-				echo $return;
+				// check if the list sorting is done
+				$listIsDone = $listHandler->CheckListStatus($listId);
+				
+				$output .= $listHandler->ShowList($listId, $listView, true, $listIsDone);
 
 				break;
 		}

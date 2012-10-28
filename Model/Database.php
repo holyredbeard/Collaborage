@@ -78,7 +78,8 @@ class Database {
 
         if ($stmt->fetch()) {
 
-            $user = array('userId' => $userId, 'username' => $username);
+            $user = array('userId' => $userId,
+                          'username' => $username);
 
             return $user;
         } else {
@@ -212,6 +213,115 @@ class Database {
         $stmt->Close();
         
         return $lists;
+    }
+
+    public function HasFinishedSorting($stmt) {
+
+        if ($stmt->execute() == false) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        if ($stmt->bind_result($result) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        if ($stmt->fetch()) {
+
+            $isFinished = $result;
+
+            return $isFinished;
+        }
+        else {
+            return null;       // Ingen match i databasen
+        }
+    }
+
+    public function CheckListStatus($stmt) {
+
+        $listIsDone = true;
+
+        if ($stmt === FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+            
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($isFinished) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            if ($isFinished == false) {
+                $listIsDone = false;
+            }
+        }
+        
+        $stmt->Close();
+
+        return $listIsDone;
+    }
+
+    public function GetListUsersIds($stmt) {
+
+        if ($stmt === FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+            
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($userId) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            $listUsers[] = $userId;
+        }
+        
+        $stmt->Close();
+        
+        return $listUsers;
+    }
+
+    public function GetListOrders($stmt) {
+
+        if ($stmt === FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+            
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($listElemId, $listElemPoints) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            //echo $listElemOrderPlace;
+            if ($listElemId != null) {
+                $listOrders[] = array('listElemId' => $listElemId,
+                                      'listElemPoints' => $listElemPoints);
+            }
+        }
+
+        $stmt->Close();
+
+        //var_dump($listOrders);
+
+        return $listOrders;
     }
     
     public function CreateNewList($stmt) {

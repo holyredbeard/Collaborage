@@ -73,9 +73,8 @@ class PageView {
                         <div id='mainContainer'>
                           $body
                         </div>
-                        <div id='footer'>
-                          footer
-                        </div>
+                        <footer>
+                        </footer>
                         $js
                   </body>
               </html>";

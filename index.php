@@ -59,6 +59,8 @@ session_start();
             $listController = new \Controller\ListController();
             $headerController = new \Controller\HeaderController();
 
+            $IsLoggedIn = $loginHandler->IsLoggedIn();
+
             if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
                 $body .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler);
             }
@@ -66,24 +68,21 @@ session_start();
                 $body .= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler);
             }
 
-            if ($loginHandler->IsLoggedIn()){
+            $actionType = $URLQueryView->GetType();
 
-                $actionType = $URLQueryView->GetType();
-
-                if ($actionType == 'list'){
-                    $body .= $listController->DoControl($loginHandler, $db, $URLQueryView);
-                }
-                else if ($actiontype == 'admin') {
-                    $body .= $userController->DoControl($userHandler, $userView);
-                }
-
-                // TODO: Ändra namn på filerna till AdminView etc...
+            if ($actionType == 'list'){
+                $body .= $listController->DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn);
             }
+            else if (($actiontype == 'admin') && ($IsLoggedIn == true)) {
+                $body .= $userController->DoControl($userHandler, $userView);
+            }
+
+            // TODO: Ändra namn på filerna till AdminView etc...
 
             //Close the database since it is no longer used
             $db->Close();
 
-            $header = $headerController->DoControl();
+            $header = $headerController->DoControl($loginHandler->IsLoggedIn());
             //$footer = new \Controller\FooterController();
             
             //Generate output

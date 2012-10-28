@@ -80,6 +80,46 @@ class ListHandler {
 		return $list;
 	}
 
+	public function SaveListOrder($userId, $listOrder, $listId) {
+
+		$listOrderArray = explode('.', $listOrder);
+		$isFinished = 1;
+
+		$i = 0;
+		foreach ($listOrderArray as $listElem) {
+
+			$query = "INSERT INTO listElemOrder (listId, listElemId, userId, listElemOrderPlace) VALUES(?, ?, ?, ?)";	
+
+			$stmt = $this->m_db->Prepare($query);
+
+			$listElemId = $listOrderArray[$i];
+			$listElemOrderPlace = $i+1;
+
+			$stmt->bind_param('iiii', $listId, $listElemId, $userId, $listElemOrderPlace);
+
+			$ret = $this->m_db->RunInsertQuery($stmt);
+
+			if ($ret == false) {
+				return false;
+			}
+
+			$i += 1;
+		}
+
+		$query = "UPDATE listUser SET isFinished = ?
+				  WHERE listId = ?
+				  AND userId = ?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param('iii', $isFinished, $listId, $userId);
+
+		// TODO: Fixa RunUpdateQuery??????
+		$ret = $this->m_db->RunInsertQuery($stmt);
+
+		return true;
+	}
+
 	public function InsertListObjects($listId, $listObjects) {
 
 		foreach ($listObjects as $listObject) {
@@ -90,7 +130,12 @@ class ListHandler {
 			$stmt->bind_param('si', $listObject, $listId);
 
 			$ret = $this->m_db->RunInsertQuery($stmt);
+
+			if ($ret == false) {
+				return false;
+			}
 		}
+		return true;
 	}
 
 	public function InsertListUsers($listId, $checkedUsers) {
@@ -106,15 +151,38 @@ class ListHandler {
 		}
 	}
 
-	public function ChangeListOrder($listId) {
-		// TODO: Implement function!
+	public function HasFinishedSorting($userId, $listId) {
 
-		/*$listOptions = $listHandler->GetListOptions($listId);		// Array
+		$query = "SELECT isFinished FROM listUser
+					WHERE userId = ?
+					AND listId = ?";
 
-		$output = $listView->ShowList;*/
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param('ii', $userId, $listId);
+
+		$result = $this->m_db->HasFinishedSorting($stmt);
+
+		if ($result != null) {
+			return $result;
+		}
 	}
 
-	public function ShowList($listId, $listView) {
+	public function CheckListStatus($listId) {
+
+		$query = "SELECT isFinished FROM listUser
+					WHERE listId = ?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param('i', $listId);
+
+		$listIsDone = $this->m_db->CheckListStatus($stmt);
+
+		return $listIsDone;
+	}
+
+	public function ShowList($listId, $listView, $userIsFinished, $listIsDone) {
 
 		$listOptions = $this->GetListOptions($listId);		// : Array
 
@@ -125,10 +193,99 @@ class ListHandler {
 					  'listOptions' => $listOptions,
 					  'listElements' => $listElements,
 					  'listUsers' => $listUsers);
-
-		$output = $listView->ShowList($list);
+		
+		$output = $listView->ShowList($list, $userIsFinished, $listIsDone);
 
 		return $output;
+	}
+
+	public function GetListUsersIds($listId) {
+
+		$query = "SELECT userId
+					FROM listUser
+					WHERE listId = ?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param('i', $listId);
+
+		$listUsers = $this->m_db->GetListUsersIds($stmt);
+
+		return $listUsers;
+	}
+
+	public function GetListOrders($listId, $listUsers) {
+
+		foreach ($listUsers as $listUser) {
+
+			$query = "SELECT listElemId, listElemOrderPlace
+						FROM listElemOrder
+						WHERE userId = ?
+						AND listId = ?";
+
+			$stmt = $this->m_db->Prepare($query);
+
+			$stmt->bind_param('ii', $listUser, $listId);
+
+			$listOrder = $this->m_db->GetListOrders($stmt);
+
+			if ($listOrder != null) {
+				$listOrders[] = $listOrder;
+			}
+		}
+
+		return $listOrders;
+	}
+
+	public function CalculateOrder($listOrders) {
+		
+		foreach ($listOrders as $listOrder) {
+			$i = 0;
+			foreach ($listOrder as $listElem) {
+				$orderPlaces[$i]['listElemId'] = $listElem['listElemId'];
+				$orderPlaces[$i]['listElemPoints'] += $listElem['listElemPoints'];
+				$i += 1;
+			}
+		}
+
+		function subval_sort($a, $subkey) {
+			foreach($a as $k=>$v) {
+				$b[$k] = strtolower($v[$subkey]);
+			}
+			arsort($b);
+			foreach($b as $key=>$val) {
+				$c[] = $a[$key];
+			}
+			return $c;
+		}
+
+		$orderedList = subval_sort($orderPlaces, 'listElemPoints');
+
+		for ($i = 0; $i < count($orderedList); $i++) {
+			$orderedList[$i]['listElemOrderPlace'] = $i+1;
+		}
+
+		return $orderedList;
+	}
+
+	public function AddListElemOrderPlaces($orderedList) {
+
+		foreach ($orderedList as $listElem) {
+
+			$query = "UPDATE listElement SET listElemOrderPlace = ?
+				  WHERE listElemId = ?";
+
+			$stmt = $this->m_db->Prepare($query);
+
+			$listElemOrderPlace = $listElem['listElemOrderPlace'];
+			$listElemId = $listElem['listElemId'];
+
+			$stmt->bind_param('ii', $listElemOrderPlace, $listElemId);
+
+			$ret = $this->m_db->RunInsertQuery($stmt);
+		}
+
+		return $ret;
 	}
 
 	// KLAR!
@@ -142,7 +299,7 @@ class ListHandler {
 
 		$stmt = $this->m_db->Prepare($query);
 
-		$stmt->bind_param("i", $listId);
+		$stmt->bind_param('i', $listId);
 		
 		$listOptions = $this->m_db->GetListOptions($stmt);
 

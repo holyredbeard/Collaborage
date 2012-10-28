@@ -13,11 +13,11 @@ class ListView {
 	private $m_newListCheckName = 'newListCheckName';
 	private $m_newListUser = 'm_newListUser[]'; 
 	private $m_newListUserCheck = 'm_newListUser'; 
-	private $m_newListObject1 = 'm_newListObject1';
-	private $m_newListObject2 = 'm_newListObject2';
-	private $m_newListObject3 = 'm_newListObject3';
-	private $m_newListObject4 = 'm_newListObject4';
-	private $m_newListObject5 = 'm_newListObject5';
+	private $m_newListObject = 'm_newListObject';
+	private $m_newListObjectDesc = 'm_newListObjectDesc';
+
+	private $m_listObject = 'notSorted';
+	private $m_listStatus = 'You haven\'n sorted the list yet!';
 
 	private $m_newListSubmit = 'newListIsSubmit';
 	private $m_newOrderListSubmit = 'newOrderListSubmit';
@@ -28,7 +28,7 @@ class ListView {
 
 			$j = 0;
 			foreach ($lists as $key) {
-				$listHTML .= "<strong>Name: </strong><a href='index.php?type=list&action=showList&listId=" . $lists[$j]['listId'] . "' />" . $lists[$j]['listName'] . "</a><br/>";
+				$listHTML .= "<a class='list' href='index.php?type=list&action=showList&listId=" . $lists[$j]['listId'] . "' />" . $lists[$j]['listName'] . "</a><br/>";
 
 				$j += 1;
 			}
@@ -39,16 +39,23 @@ class ListView {
 		$listHTML = "<div id='listContainer'><h3>Public lists</h3>";
 		$listHTML .= GenerateListHTML($publicLists);
 
-		$listHTML .= "<h3>Assigned lists</h3>";
+		$listHTML .= "<h3 class='assigned'>Assigned lists</h3>";
 
-		$listHTML .= GenerateListHTML($assignedLists);
+		if ($assignedLists != null) {
+			$listHTML .= GenerateListHTML($assignedLists);
+		}
+		else {
+			$listHTML .= "<p>You need to log in to be able to see assigned lists.";
+		}
 
 		$listHTML .= "</div>";
 
 		return $listHTML;
 	}
 
-	public function ShowList($list) {
+	public function ShowList($list, $userIsFinished, $listIsDone) {
+
+		echo $userIsFinished;
 		
 		$listId = $list['listId'];
 		$listName = $list['listOptions']['listName'];
@@ -69,73 +76,99 @@ class ListView {
 			$showExpireDate = "<p><strong>Expire date:</strong> $expireDate</p>";
 		}
 
-		function CreateListElements($list) {
+		$showUsers .= "<ul>";
 
-			// Shuffles the list elements
-			shuffle($list['listElements']);
-
-			foreach ($list['listElements'] as $element) {
-
-				$listElemId = $element['listElemId'];
-				$listElemName = $element['listElemName'];
-				$listElemDesc = $element['listElemDesc'];
-				//$orderPlace = $element['listElemOrderPlace'];
-
-				$showElements .= "<ul class='listObject'>";
-
-				$showElements .= "<li id='$listElemId' class='listObject'><strong>$listElemName</strong><br>
-										$listElemDesc</li>";
-				
-				$showElements .= "</ul>";
-			}
-
-			return $showElements;
-		}
-
-		function CreateListUsers($list) {
-			foreach ($list['listUsers'] as $user) {
+		foreach ($list['listUsers'] as $user) {
 				$userId = $user['userId'];
 				$username = $user['username'];
 				$isFinished = $user['isFinished'];
 
 				if ($isFinished == 1) {
-					$isFinished = 'Yes';
+					$userStatus = 'done sorting';
 				} else {
-					$isFinished = 'No';
+					$userStatus = 'not sorted yet';
 				}
 
-				$showUsers .= "<li><a href='index.php?showUser=$userId'>$username</a> | <strong>Done:</strong> $isFinished</strong></li>";
+				$showUsers .= "<li><a class='listUser' href='index.php?showUser=$userId'>$username</a> | $userStatus</strong></li>";
 			}
 
-			$showUsers .= "</ul>";
+		$showUsers .= "</ul>";
 
-			return $showUsers;
+		if ($userIsFinished == true) {
+			echo 'done';
+			$this->m_listObject = 'doneSorted';
+			$this->m_listStatus = 'You\'re done sorting, waiting for the others.';
+		}
+		else if ($listIsDone == true) {
+			$this->m_listStatus = 'Everyone is done. The list is sorted!';
 		}
 
-		$showUsers = CreateListUsers($list);
-		$showElements = CreateListElements($list);
+		shuffle($list['listElements']);
 
-		// Create list
-		$listHTML = "<div id='listContainer'>
-						<h2>$listName</h2>
-						<div id='listElements'>
-							$showElements
-						</div>
-						<div id='listElements2'></div>
-						<div id='listUsers'>
-							<p><hr></p>
-							<h3>Collaborators</h3>
-							$showUsers
-						</div>
-						<div id='listInfo'>
-							<h3>List info</h3>
-							<strong>List creator:</strong> $listCreator<br/>
-							<strong>Creation date:</strong> $creationDate<br/>
-							$showExpireDate
-							$isPublic
-						</div>
-						<a href='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
-					 </div>";
+		foreach ($list['listElements'] as $element) {
+
+			$listElemId = $element['listElemId'];
+			$listElemName = $element['listElemName'];
+			$listElemDesc = $element['listElemDesc'];
+			//$orderPlace = $element['listElemOrderPlace'];
+
+			$showElements .= "<ul class='$this->m_listObject'>";
+
+			$showElements .= "<li id='$listElemId' class='$this->m_listObject'><strong>$listElemName</strong><br>
+									$listElemDesc</li>";
+			
+			$showElements .= "</ul>";
+		}
+
+
+		if ($userIsFinished == false) {
+			// Create list
+			$listHTML = "<div id='listContainer'>
+							<h2>$listName</h2>
+							<div id='listElements'>
+								$showElements
+							</div>
+							<div id='listElements2'></div>
+							<div id='listUsers'>
+								<p><hr></p>
+								<h3>Collaborators</h3>
+								$showUsers
+							</div>
+							<div id='listInfo'>
+								<h3>List info</h3>
+								<strong>List status:</strong> $this->m_listStatus<br/>
+								<strong>List creator:</strong> $listCreator<br/>
+								<strong>Creation date:</strong> $creationDate<br/>
+								$showExpireDate
+								$isPublic
+							</div>
+							<a href='' url='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
+						 </div>";
+		}
+		else {
+			// Create list
+			$listHTML = "<div id='listContainer'>
+							<h2>$listName</h2>
+							<div id='listSorted'>
+								$showElements
+							</div>
+							<div id='listElements2'></div>
+							<div id='listUsers'>
+								<p><hr></p>
+								<h3>Collaborators</h3>
+								$showUsers
+							</div>
+							<div id='listInfo'>
+								<h3>List info</h3>
+								<strong>List status:</strong> $this->m_listStatus<br/>
+								<strong>List creator:</strong> $listCreator<br/>
+								<strong>Creation date:</strong> $creationDate<br/>
+								$showExpireDate
+								$isPublic
+							</div>
+							<a href='' url='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
+						 </div>";
+		}
 
 
 		return $listHTML;
@@ -154,21 +187,26 @@ class ListView {
 		$newListHTML = "<div id='newListContainer'>	
 							<form id='newListForm' method='post'>
 								<fieldset>
-									<label for='$this->m_newListName'><input type='text' name='$this->m_newListName' value='List name'/></label>
+									<h3 class='listTitle'>Create new list</h3>
+									<label for='$this->m_newListName'><input type='text' name='$this->m_newListName' value='List name'/></label><br/>
 									<label for='$this->m_newListExpireDate'><input type='text' id='datepicker' name='m_newListExpireDate' value='Expire date'/></label>
 									<p><label for='$this->m_newListIsPublic'>Public list <input type='checkbox' checked='checked' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' Value='True' /></label></p>
 									<h3>Add list objects</h3>
-									<label for='$this->m_newListObject1'><input type='text' name='$this->m_newListObject1' value=''/></label>
-									<label for='$this->m_newListObject2'><input type='text' name='$this->m_newListObject2' value=''/></label>
-									<label for='$this->m_newListObject3'><input type='text' name='$this->m_newListObject3' value=''/></label>
-									<label for='$this->m_newListObject4'><input type='text' name='$this->m_newListObject4' value=''/></label>
-									<label for='$this->m_newListObject5'><input type='text' name='$this->m_newListObject5' value=''/></label>
+									<label for='$this->m_newListObject'><input type='text' id='$this->m_newListObject' name='$this->m_newListObject' value=''/></label>
+									<div id='rememberMeDiv'>
+										<label for='$this->m_newListObjectDesc'>
+											<input type='text' id='$this->m_newListObjectDesc' name='$this->m_newListObjectDesc' value=''/>
+										</label>
+									</div>
+									<button id='addListObjectSubmit'>Add</button>
+									<div id='listOfListObjects'>
+									</div>
 								</fieldset>
 								<fieldset id='addUsers'>
 									<h3>Add users</h3>
 									$generateUsers
 								</fieldset>
-								<input type='submit' name='$this->m_newListSubmit' value='Skapa lista'/>
+								<input type='submit' id='submit' name='$this->m_newListSubmit' value='Skapa lista'/>
 							</form>
 						</div>";
 

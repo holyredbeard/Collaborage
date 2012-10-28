@@ -43,8 +43,8 @@ class LoginView {
                     $regButton
 				</div>
                 <div id='loginText'>
-                    Individually, we are one drop.
-                    <p id='textSeparator'>Together, we are an ocean.</p>
+                    Individually, we are one drop.f<br/>
+                    Together, we are an ocean.
                 </div>";
 	}
 
@@ -56,7 +56,7 @@ class LoginView {
 	public function DoLogoutBox() {
 		return "<div id='logout'>
                     <form method='get' action='index.php'>
-    					<input type='submit' class='loginButton' id='$this->_logoutButton' name='$this->_logoutButton' value='Logout' />
+    					<input type='submit' id='$this->_logoutButton' name='$this->_logoutButton' value='Logout' />
     				</form>
                 </div>";
   	}

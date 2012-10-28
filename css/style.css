@@ -1,19 +1,58 @@
 body {
-	font-family: verdana;
+	padding: 0px;
 	font-size: 12px;
-	background: #333;
-	color: black;
+	color: white;
+	font-family: sans-serif;
+}
+
+body.index{
+	width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -5000;
+	background-image:url('http://www.browsewallpapers.com/files/mountains-with-snow-scenery-1444.jpg');
+}
+
+body.index2 {
+	width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -5000;
+	background: #ccc;
+}
+
+
+#mainContainer {
+	margin-top: 60px;
+	margin-bottom: 60px;
+}
+
+input {
+	color: #888;	
 }
 
 /* HEADER */
 
 header {
-	background: #888;
-	height: 20px;
+}
+
+#headerDiv {
+	z-index: 999;
+	width: 100%;
+	height: 30px;
+	position: fixed;  
+	top: 0;
+	left: 0;
+	background: #d36c36;
 	padding: 10px;
 	overflow: hidden;
-	margin: 0px auto;
-	background: #43aa34;
+}
+
+footer {
 }
 
 #logo {
@@ -29,7 +68,7 @@ header {
 
 ul.menu{
   margin: 0px;
-  padding: 0;
+  padding: 2px;
   list-style: none;
 }
 
@@ -38,7 +77,7 @@ ul.menu li.menu {
   padding: 0;
   display: block;
   float: left;
-  width: 80px;
+  width: 100px;
   height: 20px;
 }
 
@@ -51,32 +90,49 @@ ul.menu li.menu a{
   text-align: center;
   padding-top: 2px;
   color: white;
-  font-size: 14px;
+  font-family: Tahoma, Arial, sans-serif;
+  font-size: 16px;
 }
 
 ul.menu li.menu a:hover{
   color: #fff;
-  background-color: #000;
+  text-decoration: underline;
 }​
 
-li.listObject {
-	background: red;
-}
-
-ul.listObject {
+ul.notSorted, li.notSorted, li.doneSorted {
   width: 430px;
   background: #888;
   display: block;
   text-decoration: none;
   font-size: 12px;
   list-style: none;
-  cursor: pointer;
   padding: 5px;
+  border-radius: 2px;
 }
 
-ul.listObject:hover {
+ul.notSorted:hover {
+	cursor: pointer;
 	border: 1px dashed black;
 	background: #999;
+	width: 400px;
+}
+
+li.notSorted:hover {
+	margin-left: -40px;
+}
+
+li.notSorted {
+	height: 30px;
+	margin-left: -35px;
+}
+
+li.doneSorted {
+	height: 30px;
+	margin-left: -35px;
+}
+
+ul.doneSorted {
+	
 }
 
 /* GENERAL */
@@ -89,28 +145,200 @@ ul.listObject:hover {
 
 /* FORMS */
 
+.listObjectShowText {
+	margin-right: 30px;
+}
 
 form, fieldset {
 	border: 0px;
-	width: 200px;
+	width: 400px;
+}
+
+#listOfListObjects {
+	margin-top: 50px;
+	background: red;
+}
+
+#addListObjectSubmit {
+
+}
+
+#listObjectDesc {
+	width: 225px;
+}
+
+#submit {
+	margin-left: 12px;
+}
+
+input {
+	  -moz-box-shadow:    3px 3px 5px 6px #ccc;
+  	  -webkit-box-shadow: 3px 3px 5px 6px #ccc;
+  	  box-shadow:         3px 3px 5px 6px #ccc;
+}
+
+.listTitle {
+	margin-bottom: 25px;
+}
+
+.assigned {
+	margin-top: 25px;
+}
+
+.list {
+	text-decoration: none;
+	text-transform:capitalize;
+	color: #9b2028;
+}
+
+.list:hover {
+	font-weight: bold;
+}
+
+.listUser {
+	text-decoration: none;
+	text-transform:capitalize;
+	color: #9b2028;
 }
 
 #newListContainer {
-	margin-top: 40px;
+	border-radius: 3px;
+	padding: 0px 10px 10px 10px;
 	width: 450px;
 	margin: 0px auto;
-	background: #ccc;
+	background: #b7b0a1;
+}
+
+#listContainer {
+	border-radius: 3px;
+	padding: 10px 20px 20px 20px;
+	width: 450px;
+	margin: 0px auto;
+	background: #b7b0a1;
 }
 
 #addUsers {
 	display: none;
 }
 
+#loginMenu {
+	cursor: pointer;
+	position: absolute;
+	top: 6px;
+	right: 40px;
+	z-index: 1000;
+	font-family: Tahoma, Arial, sans-serif;
+	font-size: 16px;
+
+}
+
+.button, .regButton, .loginButton, {
+    padding: 5px 10px;
+    color: #FFF;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
+.logoutButton {
+    padding: 5px 10px;
+    color: #fff;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 2px;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+}
+
+.button:hover, .regButton:hover,  .loginButton:hover, .logoutButton:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+.button:active, .regButton:active, .loginButton:active, .logoutButton:active {
+    -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    -moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6);
+}
+
+.regButton {
+	background: #d36c36;
+    border: solid 1px #20538D;
+}
+
+.regButton:hover {
+    background: #b75a2c;
+    border: solid 1px #2A4E77;	
+}
+
+.regButton:active {
+    background: #965c42;
+    border: solid 1px #203E5F;	
+}
+
+.logoutButton {
+
+}
+
+.logoutButton:hover {
+
+}
+
+.logoutButton:active {
+
+}
+
+
+#logoutButton {
+	position: absolute;
+	top: 0px;
+	right: 40px;
+
+}
+
+#rememberMeDiv {
+	top: 190px;
+}
+
+#register {
+	position: relative;
+	bottom: 0px;
+	left: 10px;
+}
+
+#loginButton {
+	position: absolute;
+	left: 220px;
+	bottom: 75px;
+}
+
 #loginForm {
+	position: relative;
 	width: 280px;
 	margin-left: 200px;
 	margin-top: 200px;
-	background: #474747;
+	background: #444;
+	padding: 0 5px 5px 5px;
+	border-radius: 5px;
 }
 
 .loginLoginField {
@@ -121,7 +349,7 @@ form, fieldset {
 }
 
 .loginPassField {
-	width: 150px;
+	width: 190px;
 	height: 25px;
 }
 
@@ -136,6 +364,19 @@ form, fieldset {
 
 #logout {
 	float: right;
+}
+
+#loginText {
+	font-family: helvetica;
+	font-size: 30px;
+	position: absolute;
+	top: 250px;
+	left: 600px;
+}
+
+#textSeparator {
+	position: absolute;
+	top: 20px;
 }
 
 /* MESSAGES */
@@ -157,14 +398,6 @@ form, fieldset {
 
 /* LIST CLASSES AND IDS!! */
 
-#listContainer {
-	color: black;
-	margin: 0px auto;
-	background: white;
-	width: 540px;
-	padding: 5px 20px 20px 20px;
-	border: 2px solid #333;
-}
 
 #listElement {
 	cursor: pointer;

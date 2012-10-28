@@ -59,8 +59,8 @@ class RegisterView {
      */
 	public function DoRegisterButton() {
 		return "<form method='post' action='index.php'>
-					<input type='submit' id='$this->_register' name='$this->_register' value='Register' />
-			</form>";
+					<input class='regButton' type='submit' id='$this->_register' name='$this->_register' value='Register' />
+			    </form>";
 	}
 
 	/**

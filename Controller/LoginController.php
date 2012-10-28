@@ -77,8 +77,8 @@ class LoginController {
         	$xhtml = $loginView->DoLogoutBox();
         }
         else {
-        	$xhtml = $loginView->DologinBox();
-            $xhtml.= $registerView->DoRegisterButton();
+            $regButton = $registerView->DoRegisterButton();
+        	$xhtml = $loginView->DologinBox($regButton);
         }
 
 	return $controlInfo . $xhtml;

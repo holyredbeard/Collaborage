@@ -32,11 +32,10 @@ class LoginHandler {
 
 	public function GetStoredUser() {
 		if(isset($_SESSION[$this->m_storedUser])) {
-			echo 'finns';
 			return $_SESSION[$this->m_storedUser];
 		}
 		else {
-			echo 'finns ej';
+			return null;
 		}
 		//return isset($_SESSION[$this->m_storedUser]) ? $_SESSION[$this->m_storedUser] : false;
 	}
@@ -62,9 +61,12 @@ class LoginHandler {
 		if ($user != null){
 			$_SESSION[$this->m_checkLoginState] = $this->m_sessionCheck;
 			$_SESSION[$this->m_storedUser] = $user;
-		}
 
-		return $ret;
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	/**

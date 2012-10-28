@@ -4,16 +4,25 @@ namespace View;
 
 class HeaderView {
 	
-	public function GetMenu() {
+	public function GetMenu($isLoggedIn) {
 
-		$menu = "<ul class='menu'>
-					<li class='menu'><a href='index.php?type=list&action=newList'>Create list</a></li>
+		if ($isLoggedIn == false) {
+			$menu = "<div id='loginMenu'>
+						Login
+					</div>";
+		}
+
+		$menu .= "<div id='headerDiv'><ul class='menu'>
+					<div id='logo'>Collaborage</div>
+					<li class='menu'><a href='index.php?type=list&action=newList'>+ Create list</a></li>
     				<li class='menu'><a href='index.php?type=list&action=showLists'>Lists</a></li>
-    				<li class='menu'><a href='index.php?type=users&action=viewPeople'>People</a></li>
     				<li class='menu'><a href='index.php?type=admin&action=showUsers'>Admin</a></li>
   				</ul>
-  				<div class='clear'></div>";
+  				<div class='clear'></div></div>";
+
+		echo $menu;
 
 		return $menu;
+		
 	}
 }
