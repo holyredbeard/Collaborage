@@ -2,8 +2,6 @@ var Capsule = {
 
     init: function () {
 
-    	var LI_POSITION = 'li_position';
-
     	$(function() {
 		    $("#listElements").sortable({
 
@@ -19,19 +17,39 @@ var Capsule = {
     		$('body').removeClass('index').addClass('index2');
     	}
 
+    	$('#cancelList').click(function() {
+    		alert('fixa denna bild och så att listan försvinner om man trycker här');
+    	});
+
+		$('#loginMenu').live('click', function () {
+			$('#loginForm').toggle();
+     	});
+
+     	if($('#notLoggedIn').length) {
+     		$('#notLoggedIn').effect("bounce", {
+     			times: 4,
+     			direction: 'right'
+     		}, 2000, function() {
+    			$('#notLoggedIn').fadeOut("slow");
+  			});
+     		$('#loginForm').show();
+     	}
+
     	// Lägg till listobjekt
     	var i = 0;
 
     	$('#addListObjectSubmit').click(function (e) {
 
-    		var listObjectName = $('#m_newListObject').val();
+    		var listObjectName = $('#listObjectName').val();
+
+    		$('#listObjectName').val('');
 
     		if((listObjectName == null) || (listObjectName == '')) {
     			return false;
     		}
     		else {
     			var listObjectDesc = $('#m_newListObjectDesc').val();
-    			alert(listObjectDesc);
+    			$('#m_newListObjectDesc').val('');
 
     			var listDiv = 'listDiv' + i;
 
@@ -46,17 +64,40 @@ var Capsule = {
     				text: listObjectName
     			}).appendTo('#' + listDiv);
 
-    			$('<span>', {
-    				class: 'listObjectShowText',
+    			$('<br>', {
+    				class: 'listObjectShowDesc',
     				id: 'listObjectDesc' + i,
     				text: listObjectDesc
     			}).appendTo('#' + listDiv);
 
-    			$('<a>', {
+    			$('<span>', {
+    				class: 'listObjectShowDesc',
+    				id: 'listObjectDesc' + i,
+    				text: listObjectDesc
+    			}).appendTo('#' + listDiv);
+
+    			$('<span>', {
     				href: '#',
+    				class: 'listObjectRemove',
     				id: 'removeListObject' + i,
-    				text: 'Remove'
-    			}).appendTo('#' +listDiv);
+    				text: 'X'
+    			}).appendTo('#' + listDiv);
+
+    			$('<input>', {
+    				type: 'hidden',
+    				class: 'removeListObject' + i,
+    				name: 'newListObject[]',
+    				id: 'listObjectName' + i,
+    				value: listObjectName
+    			}).appendTo('#listOfListObjects');
+
+    			$('<input>', {
+    				type: 'hidden',
+    				class: 'removeListObject' + i,
+    				name: 'newListObjectDesc[]',
+    				id: 'listObjectDesc' + i,
+    				value: listObjectDesc
+    			}).appendTo('#listOfListObjects');
     		}
 
     		i += 1;
@@ -65,7 +106,51 @@ var Capsule = {
     		e.preventdefault();
     	});
 
-    	
+		$('#submit').live('click', function(){
+			e.preventdefault();
+		});
+
+		$('.listObjectRemove').live('click',function(){
+			var id = $(this).attr('id');
+			var output = id.substring(16);
+			var inputToRemove = '.' + 'removeListObject' + (output);
+
+			var listToRemoveId = 'listDiv' + output;
+			$('#' + listToRemoveId).remove();
+
+			//$("[id^=jander]");98ı
+                  
+			$(inputToRemove).remove();
+		});
+
+
+
+		$('.default').each(function(){
+	    	var defaultVal = $(this).attr('title');
+	    	$(this).focus(function(){
+	      		if ($(this).val() == defaultVal){
+	        		$(this).removeClass('active').val('');
+	      		}
+	    	})
+	    	.blur(function(){
+	      		if ($(this).val() == ''){
+	        		$(this).addClass('active').val(defaultVal);
+	      		}
+	    	})
+	    	.blur().addClass('active');
+	  	});
+	  	$('form').submit(function(){
+  			$('.default').each(function(){
+    			var defaultVal = $(this).attr('title');
+    			if ($(this).val() == defaultVal){
+      				$(this).val('');
+    			}
+  			});
+		});
+
+
+
+
 
 		$('#listElements').sortable({
 			opacity: 0.5,
@@ -90,9 +175,8 @@ var Capsule = {
 		        $('#newOrder').attr('href',url);
 			}
         });
-        $("ul, li").disableSelection();
-
-    	
+        $("ul, li, #loginMenu").disableSelection();
+   	
     	$(function() {
         	$('#datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
     	});

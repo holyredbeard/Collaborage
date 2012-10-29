@@ -33,6 +33,9 @@ class ListController {
 						$output .= $listView->CreateListForm($users, $loginHandler);
 					}
 				}
+				else {
+					$output .= $listView->ShowNotLoggedIn();
+				}
 
 				break;
 

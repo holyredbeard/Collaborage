@@ -32,20 +32,21 @@ class LoginView {
      */
 	public function DoLoginBox($regButton) {
   		return "<div id='loginForm'>
+                    <span id='loginHeader'>Login</span>
 					<form id='form1' method='post' action=''>
 						<fieldset>
-							<label for='$this->_loginUserName'><br /><input type='text' value='your login name' class='loginLoginField' id='$this->_loginUserName' name='$this->_loginUserName' size='20' /></label><br/>
+							<label for='$this->_loginUserName'><br /><input type='text' value='Login name' class='loginLoginField' id='$this->_loginUserName' name='$this->_loginUserName' size='20' /></label><br/>
 							<label for='$this->_loginPassword' ><br /><input type='password' class='loginPassField' id='$this->_loginPassword' name='$this->_loginPassword' size='20' /></label><br/>
-							<input type='submit' class='loginButton' id='$this->_loginButton' name='$this->_loginButton' value='Login' />
-							<label for='$this->_rememberMe' id='$this->_rememberCheck' ><input type='checkbox' id='$this->_rememberMe' name='$this->_rememberMe' value='loggedIn' />Remember me</label>
+							<div id='loginButtonDiv'>
+                                <input type='submit' class='loginButton' id='$this->_loginButton' name='$this->_loginButton' value='Login' />
+							</div>
+                            <div id='rememberMeDiv'>
+                                <label for='$this->_rememberMe' id='$this->_rememberCheck' ><input type='checkbox' id='$this->_rememberMe' name='$this->_rememberMe' value='loggedIn' />Remember me</label>
+                            </div>
 						</fieldset>
 					</form>
                     $regButton
-				</div>
-                <div id='loginText'>
-                    Individually, we are one drop.
-                    <p id='textSeparator'>Together, we are an ocean.</p>
-                </div>";
+				</div>";
 	}
 
     /**

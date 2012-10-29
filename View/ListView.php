@@ -13,8 +13,9 @@ class ListView {
 	private $m_newListCheckName = 'newListCheckName';
 	private $m_newListUser = 'm_newListUser[]'; 
 	private $m_newListUserCheck = 'm_newListUser'; 
-	private $m_newListObject = 'm_newListObject';
+	private $m_newListObject = 'newListObject[]';
 	private $m_newListObjectDesc = 'm_newListObjectDesc';
+	private $m_listObjectName = 'listObjectName';
 
 	private $m_listObject = 'notSorted';
 	private $m_listStatus = 'You haven\'n sorted the list yet!';
@@ -54,8 +55,6 @@ class ListView {
 	}
 
 	public function ShowList($list, $userIsFinished, $listIsDone) {
-
-		echo $userIsFinished;
 		
 		$listId = $list['listId'];
 		$listName = $list['listOptions']['listName'];
@@ -73,7 +72,7 @@ class ListView {
 		if ($list['listOptions']['expireDate'] != NULL) {
 			$expireDate = $list['listOptions']['expireDate'];
 
-			$showExpireDate = "<p><strong>Expire date:</strong> $expireDate</p>";
+			$showExpireDate = "<p><strong>Deadline:</strong> $expireDate</p>";
 		}
 
 		$showUsers .= "<ul>";
@@ -187,15 +186,16 @@ class ListView {
 		$newListHTML = "<div id='newListContainer'>	
 							<form id='newListForm' method='post'>
 								<fieldset>
+									
 									<h3 class='listTitle'>Create new list</h3>
-									<label for='$this->m_newListName'><input type='text' name='$this->m_newListName' value='List name'/></label><br/>
-									<label for='$this->m_newListExpireDate'><input type='text' id='datepicker' name='m_newListExpireDate' value='Expire date'/></label>
+									<label for='$this->m_newListName'><input type='text' class='default' name='$this->m_newListName' title='List name'/></label><br/>
+									<label for='$this->m_newListExpireDate'><input type='text' class='default' id='datepicker' name='m_newListExpireDate' title='Expire date'/></label>
 									<p><label for='$this->m_newListIsPublic'>Public list <input type='checkbox' checked='checked' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' Value='True' /></label></p>
 									<h3>Add list objects</h3>
-									<label for='$this->m_newListObject'><input type='text' id='$this->m_newListObject' name='$this->m_newListObject' value=''/></label>
-									<div id='rememberMeDiv'>
+									<label for='$this->m_listObjectName'><input type='text' class='default' id='$this->m_listObjectName' name='$this->m_newListObject' title='List object name'/></label>
+									<div id='newListObjectsDiv'>
 										<label for='$this->m_newListObjectDesc'>
-											<input type='text' id='$this->m_newListObjectDesc' name='$this->m_newListObjectDesc' value=''/>
+											<input type='text' class='default' id='$this->m_newListObjectDesc' name='$this->m_newListObjectDesc' title='List object description'/>
 										</label>
 									</div>
 									<button id='addListObjectSubmit'>Add</button>
@@ -256,20 +256,23 @@ class ListView {
 		}
 		
 		// TODO: Ändra kod för detta!!!!!!
-		if (isset($_POST[$this->m_newListObject1])) {
-			$listObjects[] = $_POST[$this->m_newListObject1];
+		if (isset($_POST['newListObject'])) {
+			$listObjectNames = $_POST['newListObject'];
 		}
-		if (isset($_POST[$this->m_newListObject2])) {
-			$listObjects[] = $_POST[$this->m_newListObject2];
+
+		if (isset($_POST['newListObjectDesc'])) {
+			$listObjectDescs = $_POST['newListObjectDesc'];
 		}
-		if (isset($_POST[$this->m_newListObject3])) {
-			$listObjects[] = $_POST[$this->m_newListObject3];
-		}
-		if (isset($_POST[$this->m_newListObject4])) {
-			$listObjects[] = $_POST[$this->m_newListObject4];
-		}
-		if (isset($_POST[$this->m_newListObject5])) {
-			$listObjects[] = $_POST[$this->m_newListObject5];
+
+		$nrOf = count($listObjectNames);
+
+		for($i = 0; $i < $nrOf-1; $i++) {
+			$listObjectName = $listObjectNames[$i+1];
+
+			$listObjectDesc = $listObjectDescs[$i];
+
+			$listObjects[] = array('listObjectName' => $listObjectName,
+								 'listObjectDesc' => $listObjectDesc);
 		}
 
 		if (isset($_POST[$this->m_newListUserCheck])) {
@@ -278,7 +281,6 @@ class ListView {
 
 			foreach($userCheckBoxes as $user) {
 	        	$checkedUsers[] = $user;
-	        	var_dump($checkedUsers);
 	    	}
 		}
 
@@ -306,7 +308,6 @@ class ListView {
 		if(isset($_POST['json'])) {
 			$json = $_POST['json']; // $json is a string
 			$person = json_decode($json); // $person is an array with a key 'name'
-			var_dump($person);
 		}
 	}
 
@@ -324,5 +325,14 @@ class ListView {
 										</fieldset>
 									</form>
 								</div>";
+	}
+
+	public function ShowNotLoggedIn() {
+
+		$output = "<div id='notLoggedIn'>
+					You need to log in to be able to create a new list!
+					</div>";	
+
+		return $output;
 	}
 }

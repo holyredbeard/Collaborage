@@ -257,7 +257,7 @@ class Database {
         // Hämtar ids och användarnamn och lägger i arrayen.
         while ($stmt->fetch()) {
             if ($isFinished == false) {
-                $listIsDone = false;
+            $listIsDone = false;
             }
         }
         
@@ -378,7 +378,7 @@ class Database {
         }
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listElemId, $listElemName, $listElemOrderPlace, $listElemDesc) == FALSE) {
+        if ($stmt->bind_result($listElemId, $listElemName, $listElemDesc, $listElemOrderPlace) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
 
@@ -388,8 +388,8 @@ class Database {
         while ($stmt->fetch()) {
             $listElements[] = array('listElemId' => $listElemId,
                                  'listElemName' => $listElemName,
-                                 'listElemOrderPlace' => $listElemOrderPlace,
-                                 'listElemDesc' => $listElemDesc);
+                                 'listElemDesc' => $listElemDesc,
+                                 'listElemOrderPlace' => $listElemOrderPlace);
         }
         
         $stmt->Close();

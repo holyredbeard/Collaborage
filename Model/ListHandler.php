@@ -122,12 +122,17 @@ class ListHandler {
 
 	public function InsertListObjects($listId, $listObjects) {
 
+		var_dump($listObjects);
 		foreach ($listObjects as $listObject) {
-			$query = "INSERT INTO listElement (listElemName, listId) VALUES(?, ?)";
+
+			$listObjectName = $listObject['listObjectName'];
+			$listObjectDesc = $listObject['listObjectDesc'];
+
+			$query = "INSERT INTO listElement (listElemName, listId, listElemDesc) VALUES(?, ?, ?)";
 
 			$stmt = $this->m_db->Prepare($query);
 
-			$stmt->bind_param('si', $listObject, $listId);
+			$stmt->bind_param('sis', $listObjectName, $listId, $listObjectDesc);
 
 			$ret = $this->m_db->RunInsertQuery($stmt);
 
@@ -197,6 +202,41 @@ class ListHandler {
 		$output = $listView->ShowList($list, $userIsFinished, $listIsDone);
 
 		return $output;
+	}
+
+	// KLAR!
+	public function GetListOptions($listId) {
+		
+		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, .l.expireDate, l.isPublic, u.username
+					FROM list AS l
+					INNER JOIN user AS u
+					ON l.userId = u.userId
+					WHERE l.listId=?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param('i', $listId);
+		
+
+		$listOptions = $this->m_db->GetListOptions($stmt);
+
+		return $listOptions;
+	}
+
+	// KLAR!
+	public function GetListElements($listId) {
+		
+		$query = "SELECT listElemId, listElemName, listElemDesc, listElemOrderPlace
+					FROM listElement
+					WHERE listId=?";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param("i", $listId);
+		
+		$listElements = $this->m_db->GetListElements($stmt);
+
+		return $listElements;
 	}
 
 	public function GetListUsersIds($listId) {
@@ -286,42 +326,6 @@ class ListHandler {
 		}
 
 		return $ret;
-	}
-
-	// KLAR!
-	public function GetListOptions($listId) {
-		
-		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, .l.expireDate, l.isPublic, u.username
-					FROM list AS l
-					INNER JOIN user AS u
-					ON l.userId = u.userId
-					WHERE l.listId=?";
-
-		$stmt = $this->m_db->Prepare($query);
-
-		$stmt->bind_param('i', $listId);
-		
-		$listOptions = $this->m_db->GetListOptions($stmt);
-
-		return $listOptions;
-	}
-
-	// KLAR!
-	public function GetListElements($listId) {
-		
-		$query = "SELECT le.listElemId, le.listElemName, le.listElemOrderPlace, led.listElemDesc
-					FROM listElement AS le
-					LEFT JOIN listElemDesc as led
-					ON le.listElemId = led.listElemId
-					WHERE le.listId=?";
-
-		$stmt = $this->m_db->Prepare($query);
-
-		$stmt->bind_param("i", $listId);
-		
-		$listElements = $this->m_db->GetListElements($stmt);
-
-		return $listElements;
 	}
 
 	// KLAR!

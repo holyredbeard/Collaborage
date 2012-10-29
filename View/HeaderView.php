@@ -9,6 +9,7 @@ class HeaderView {
 		if ($isLoggedIn == false) {
 			$menu = "<div id='loginMenu'>
 						Login
+						<img id='loginArrow' src='img/arrow.png' />
 					</div>";
 		}
 
