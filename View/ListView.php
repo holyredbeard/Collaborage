@@ -9,7 +9,6 @@ class ListView {
 	private $m_newListName = 'newListName';
 	private $m_newListCreationDate = 'newListCreationDate';
 	private $m_newListExpireDate = 'newListExpireDate';
-	private $m_newListIsPublic = 'newListIsPublic';
 	private $m_newListCheckName = 'newListCheckName';
 	private $m_newListUser = 'm_newListUser[]'; 
 	private $m_newListUserCheck = 'm_newListUser'; 
@@ -18,12 +17,12 @@ class ListView {
 	private $m_listObjectName = 'listObjectName';
 
 	private $m_listObject = 'notSorted';
-	private $m_listStatus = 'You haven\'n sorted the list yet!';
+	private $m_listStatus = 'You haven\'t sorted the list yet!';
 
 	private $m_newListSubmit = 'newListIsSubmit';
 	private $m_newOrderListSubmit = 'newOrderListSubmit';
 
-	public function ShowAllLists($publicLists, $assignedLists) {
+	public function ShowAllLists($assignedLists, $usersLists, $IsLoggedIn) {
 
 		function GenerateListHTML($lists) {
 
@@ -37,16 +36,28 @@ class ListView {
 			return $listHTML;
 		}
 
-		$listHTML = "<div id='listContainer'><h3>Public lists</h3>";
-		$listHTML .= GenerateListHTML($publicLists);
 
-		$listHTML .= "<h3 class='assigned'>Assigned lists</h3>";
+		$listHTML = "<div id='listContainer'>";
+		$listHTML .= "<h2>Lists</h2>";
 
-		if ($assignedLists != null) {
-			$listHTML .= GenerateListHTML($assignedLists);
-		}
-		else {
-			$listHTML .= "<p>You need to log in to be able to see assigned lists.";
+		if ($IsLoggedIn) {
+			$listHTML .= "<h3 class='usersLists'>Your lists</h3>";
+
+			if ($usersLists != null) {
+				$listHTML .= GenerateListHTML($usersLists);
+			}
+			else {
+				$listHTML .= "<p>You haven't created any lists yet...</p>";
+			}
+
+			$listHTML .= "<h3 class='assigned'>Lists you're assigned to</h3>";
+			
+			if ($assignedLists != null) {
+				$listHTML .= GenerateListHTML($assignedLists);
+			}
+			else {
+				$listHTML .= "<p>You're not assigned to any lists...</p>";
+			}
 		}
 
 		$listHTML .= "</div>";
@@ -54,20 +65,25 @@ class ListView {
 		return $listHTML;
 	}
 
-	public function ShowList($list, $userIsFinished, $listIsDone) {
+	public function ShowList($list, $userIsFinished, $allHasSorted, $theUser) {
+
+		$theUserId = $theUser['userId'];
+		$theUserName = $theUser['username'];
+
+		echo $theUserName . '<<<<<<<<<<';
+		echo $theUserId . '<<<<<<<<<<';
 		
 		$listId = $list['listId'];
 		$listName = $list['listOptions']['listName'];
 		$listCreator = $list['listOptions']['listCreator'];
 
-		$creationDate = $list['listOptions']['creationDate'];
-
-		if ($list['listOptions']['isPublic'] == true){
-			$isPublic = "<p><strong>Public list: </strong>Yes</p>";
+		if ($listCreator == $theUserName) {
+			$listCreator = 'You';
 		}
 		else {
-			$isPublic = "<p><strong>Public list: </strong>No</p>";
 		}
+
+		$creationDate = $list['listOptions']['creationDate'];
 
 		if ($list['listOptions']['expireDate'] != NULL) {
 			$expireDate = $list['listOptions']['expireDate'];
@@ -75,43 +91,49 @@ class ListView {
 			$showExpireDate = "<p><strong>Deadline:</strong> $expireDate</p>";
 		}
 
-		$showUsers .= "<ul>";
+		function CheckStatus($isFinished) {
+			if ($isFinished) {
+				return 'done sorting';
+			}
+			else {
+				return 'not sorted yet';
+			}
+		}
+
+		$userStatus = CheckStatus($isFinished);
+
+		$showUsers .= "<ul><li class='userList'><strong><span class='userName'>$theUserName (you)</span></strong><span class='userStatus'>$userStatus</span></li>";
 
 		foreach ($list['listUsers'] as $user) {
 				$userId = $user['userId'];
 				$username = $user['username'];
 				$isFinished = $user['isFinished'];
 
-				if ($isFinished == 1) {
-					$userStatus = 'done sorting';
-				} else {
-					$userStatus = 'not sorted yet';
-				}
-
-				$showUsers .= "<li><a class='listUser' href='index.php?showUser=$userId'>$username</a> | $userStatus</strong></li>";
+				$userStatus = CheckStatus($isFinished);
+				$showUsers .= "<li class='userList'><strong><span class='userName'>$username</span></strong><span class='userStatus'>$userStatus</span></li>";
 			}
 
 		$showUsers .= "</ul>";
 
-		if ($userIsFinished == true) {
-			echo 'done';
+		if (($userIsFinished) && ($allHasSorted == false)) {
 			$this->m_listObject = 'doneSorted';
 			$this->m_listStatus = 'You\'re done sorting, waiting for the others.';
 		}
-		else if ($listIsDone == true) {
+		else if ($allHasSorted) {
+			$this->m_listObject = 'doneSorted';
 			$this->m_listStatus = 'Everyone is done. The list is sorted!';
 		}
-
-		shuffle($list['listElements']);
+		else {
+			shuffle($list['listElements']);
+		}
 
 		foreach ($list['listElements'] as $element) {
 
 			$listElemId = $element['listElemId'];
 			$listElemName = $element['listElemName'];
 			$listElemDesc = $element['listElemDesc'];
-			//$orderPlace = $element['listElemOrderPlace'];
 
-			$showElements .= "<ul class='$this->m_listObject'>";
+			$showElements .= "<ul>";
 
 			$showElements .= "<li id='$listElemId' class='$this->m_listObject'><strong>$listElemName</strong><br>
 									$listElemDesc</li>";
@@ -134,14 +156,13 @@ class ListView {
 								$showUsers
 							</div>
 							<div id='listInfo'>
-								<h3>List info</h3>
+								<h3 class='listInfo'>List info</h3>
 								<strong>List status:</strong> $this->m_listStatus<br/>
 								<strong>List creator:</strong> $listCreator<br/>
 								<strong>Creation date:</strong> $creationDate<br/>
 								$showExpireDate
-								$isPublic
 							</div>
-							<a href='' url='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
+							<a class='buttonStyle' url='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
 						 </div>";
 		}
 		else {
@@ -158,12 +179,11 @@ class ListView {
 								$showUsers
 							</div>
 							<div id='listInfo'>
-								<h3>List info</h3>
+								<h3 class='listInfo'>List info</h3>
 								<strong>List status:</strong> $this->m_listStatus<br/>
 								<strong>List creator:</strong> $listCreator<br/>
 								<strong>Creation date:</strong> $creationDate<br/>
 								$showExpireDate
-								$isPublic
 							</div>
 							<a href='' url='index.php?type=list&action=saveNewListOrder&listId=$listId' id='newOrder'>Save</a><br/>
 						 </div>";
@@ -173,13 +193,19 @@ class ListView {
 		return $listHTML;
 	}
 
-	public function CreateListForm($users) {
+	public function CreateListForm($users, $theUser) {
 
 		$i = 0;
 		foreach ($users[0] as $key) {
-			$userId = $users[0][$i];
-			$userName = $users[1][$i];
-			$generateUsers .= "$userName <input type='checkbox' name='$this->m_newListUser' value='$userId' /></br>";
+			if ($users[0][$i] == $theUser) {
+				unset($users[0][$i]);
+				unset($users[1][$i]);
+			}
+			else {
+				$userId = $users[0][$i];
+				$userName = $users[1][$i];
+				$generateUsers .= "$userName <input type='checkbox' name='$this->m_newListUser' value='$userId' /></br>";
+			}
 			$i += 1;
 		}
 
@@ -188,17 +214,16 @@ class ListView {
 								<fieldset>
 									
 									<h3 class='listTitle'>Create new list</h3>
-									<label for='$this->m_newListName'><input type='text' class='default' name='$this->m_newListName' title='List name'/></label><br/>
-									<label for='$this->m_newListExpireDate'><input type='text' class='default' id='datepicker' name='m_newListExpireDate' title='Expire date'/></label>
-									<p><label for='$this->m_newListIsPublic'>Public list <input type='checkbox' checked='checked' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' Value='True' /></label></p>
+									<label for='$this->m_newListName'><input type='text' class='default tooltip' name='$this->m_newListName' title='Give your list an awesome name.' defaultValue='List name'/></label><br/>
+									<label for='$this->m_newListExpireDate'><input type='text' class='default tooltip' id='datepicker' name='m_newListExpireDate' title='Choose a deadline for sorting the list' defaultValue='Expire date'/></label>
 									<h3>Add list objects</h3>
-									<label for='$this->m_listObjectName'><input type='text' class='default' id='$this->m_listObjectName' name='$this->m_newListObject' title='List object name'/></label>
+									<label for='$this->m_listObjectName'><input type='text' class='default tooltip' id='$this->m_listObjectName' name='$this->m_newListObject' title='Type the name of the list object' defaultValue='List object name'/></label>
 									<div id='newListObjectsDiv'>
 										<label for='$this->m_newListObjectDesc'>
-											<input type='text' class='default' id='$this->m_newListObjectDesc' name='$this->m_newListObjectDesc' title='List object description'/>
+											<input type='text' class='default tooltip' id='$this->m_newListObjectDesc' name='$this->m_newListObjectDesc' title='Describe the list object so that other understand what it is' defaultValue='List object description'/>
 										</label>
 									</div>
-									<button id='addListObjectSubmit'>Add</button>
+									<button id='addListObjectSubmit'>+Add</button>
 									<div id='listOfListObjects'>
 									</div>
 								</fieldset>
@@ -235,6 +260,8 @@ class ListView {
 	// TODO: Eventuellt en GET-funktion för varje fält... det är nog att föredra.
 	public function GetNewList($loginHandler, $user) {
 
+		$listOk = true;
+
 		$userId = $user['userId'];
 
 		$listName = 'listName';
@@ -247,12 +274,8 @@ class ListView {
 		if (isset($_POST[$this->m_newListName])) {
 			$listName = $_POST[$this->m_newListName];
 		}
-
-		if (isset($_POST[$this->m_newListIsPublic])) {
-			$isPublic = true;
-		}
 		else {
-			$isPublic = false;
+			$listOk = false;
 		}
 		
 		// TODO: Ändra kod för detta!!!!!!
@@ -289,7 +312,6 @@ class ListView {
 						 'expireDate' => $expireDate,
 						 'listObjects' => $listObjects,
 						 'checkedUsers' => $checkedUsers,
-						 'isPublic' => $isPublic,
 						 'userId' => $userId);
 
 		return $newList;
@@ -309,22 +331,6 @@ class ListView {
 			$json = $_POST['json']; // $json is a string
 			$person = json_decode($json); // $person is an array with a key 'name'
 		}
-	}
-
-	public function CreateUserList() {
-
-		$userList = "<div id='newListContainer'>	
-									<form id='newListUserForm' method='post'>
-										<fieldset>
-											<label for='$this->m_newListCheckName'>User 1<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-											<label for='$this->m_newListCheckName'>User 2<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-											<label for='$this->m_newListCheckName'>User 3<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-											<label for='$this->m_newListCheckName'>User 4<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-											<label for='$this->m_newListCheckName'>User 5<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-											<label for='$this->m_newListCheckName'>User 6<input type='checkbox' id='$this->m_newListIsPublic' name='$this->m_newListIsPublic' value='loggedIn' /></label>
-										</fieldset>
-									</form>
-								</div>";
 	}
 
 	public function ShowNotLoggedIn() {

@@ -15,7 +15,7 @@ class HeaderView {
 
 		$menu .= "<div id='headerDiv'><ul class='menu'>
 					<div id='logo'>Collaborage</div>
-					<li class='menu'><a href='index.php?type=list&action=newList'>+ Create list</a></li>
+					<li class='menu'><a href='index.php?type=list&action=newList'>+Create list</a></li>
     				<li class='menu'><a href='index.php?type=list&action=showLists'>Lists</a></li>
     				<li class='menu'><a href='index.php?type=admin&action=showUsers'>Admin</a></li>
   				</ul>

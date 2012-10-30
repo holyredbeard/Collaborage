@@ -2,14 +2,6 @@ var Capsule = {
 
     init: function () {
 
-    	$(function() {
-		    $("#listElements").sortable({
-
-		      revert: true
-		    });
-		    $("ul, li").disableSelection();
-		  });
-
     	if($('#loginForm').length) {
     		$('body').addClass('index');
     	}
@@ -107,6 +99,7 @@ var Capsule = {
     	});
 
 		$('#submit').live('click', function(){
+            alert('sdf');
 			e.preventdefault();
 		});
 
@@ -126,7 +119,7 @@ var Capsule = {
 
 
 		$('.default').each(function(){
-	    	var defaultVal = $(this).attr('title');
+	    	var defaultVal = $(this).attr('defaultValue');
 	    	$(this).focus(function(){
 	      		if ($(this).val() == defaultVal){
 	        		$(this).removeClass('active').val('');
@@ -141,16 +134,17 @@ var Capsule = {
 	  	});
 	  	$('form').submit(function(){
   			$('.default').each(function(){
-    			var defaultVal = $(this).attr('title');
+    			var defaultVal = $(this).attr('defaultValue');
     			if ($(this).val() == defaultVal){
       				$(this).val('');
     			}
   			});
 		});
 
+		$('.tooltip').tipsy({trigger: 'focus', gravity: 'w'});
 
 
-
+		
 
 		$('#listElements').sortable({
 			opacity: 0.5,
@@ -203,22 +197,6 @@ var Capsule = {
 		    });
 		    return submit;
 		});
-
-		$('#newListIsPublic').change(function () {
-
-	    	Capsule.showUserList(true);
-	 	});
-		
-	},
-	
-	showUserList: function(isPublic){
-
-		if ($('#addUsers').is(":visible")) {
-				$('#addUsers').hide();
-		}
-		else {
-			$('#addUsers').show();
-		}
 	}
 }
 

@@ -24,13 +24,15 @@ class ListController {
 					if ($listView->WantToCreateList()) {
 						$list = $listView->GetNewList($loginHandler, $user);
 
-						$list = $listHandler->SaveNewList($list);
+						if ($list != null) {
+							$list = $listHandler->SaveNewList($list);
 
-						$output = $listHandler->ShowList($list['listId'], $listView, false, false);
+							$output = $listHandler->ShowList($list['listId'], $listView, false, false, $user);
+						}
 					}
 					else {
 						$users = $userHandler->GetAllUsers();
-						$output .= $listView->CreateListForm($users, $loginHandler);
+						$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler);
 					}
 				}
 				else {
@@ -40,18 +42,13 @@ class ListController {
 				break;
 
 			case 'showLists':
-				//$lists = $listHandler->GetAllLists($listView);
-				//
-				$publicLists = $listHandler->GetAllPublicLists();
 
 				if ($IsLoggedIn) {
 					$assignedLists = $listHandler->GetAssignedLists($user['userId']);
-				}
-				else {
-					$assignedLists = null;
-				}
+					$usersLists = $listHandler->GetUsersLists($user['userId']);
 
-				$output .= $listView->ShowAllLists($publicLists, $assignedLists);
+					$output .= $listView->ShowAllLists($assignedLists, $usersLists, $IsLoggedIn);
+				}
 
 				break;
 
@@ -63,11 +60,15 @@ class ListController {
 				// Vidare om någon inte är klar visas den lista man senast skapade, låst.
 				// Om möjlighet ska finnas ska det här gå att låsa upp om man vill ändra
 
-				$isFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
+				$userIsFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
+
+				if ($userIsFinished) {
+					$allHasSorted = $listHandler->AllHasSorted($listId);
+				}
 
 				// If not finished, let's sort the list!
-				if ($isFinished != false) {
-
+				if ($allHasSorted == true) {
+					
 					$listUsers = $listHandler->GetListUsersIds($listId);
 
 					$listOrders = $listHandler->GetListOrders($listId, $listUsers);
@@ -77,16 +78,13 @@ class ListController {
 					$wasAdded = $listHandler->AddListElemOrderPlaces($orderedList);
 				}
 
+				//echo $allHasSorted . '< is allHasSorted';
+
 				// check if the list sorting is done
-				$listIsDone = $listHandler->CheckListStatus($listId);
+				//$listIsDone = $listHandler->CheckListStatus($listId);
 
 				// Show the list!
-				$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, $listIsDone);
-
-				break;
-
-			case 'viewList':
-				$output .= $listHandler->ShowList(101, $listView);
+				$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, $allHasSorted, $user);
 
 				break;
 
@@ -97,31 +95,13 @@ class ListController {
 				$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
 
 				// check if the list sorting is done
-				$listIsDone = $listHandler->CheckListStatus($listId);
+				$allHasSorted = $listHandler->CheckListStatus($listId);
 				
-				$output .= $listHandler->ShowList($listId, $listView, true, $listIsDone);
+				$output .= $listHandler->ShowList($listId, $listView, true, $allHasSorted, $user);
 
 				break;
 		}
 
 		return $output;
-	}	
-
-	public function ChangeListOrder($listId) {
-		$listOptions = $listHandler->GetListOptions($listId);		// Array
-
-		$output = $listView->ShowList;
 	}
 }
-
-
-
-		//if ($listView->WantToViewList()) {
-			//$listId = $mainView->GetListToView();
-			//
-			
-
-			//$output = $listView->ShowList($listId);
-		//}
-		//
-		//

@@ -35,8 +35,8 @@ class LoginView {
                     <span id='loginHeader'>Login</span>
 					<form id='form1' method='post' action=''>
 						<fieldset>
-							<label for='$this->_loginUserName'><br /><input type='text' value='Login name' class='loginLoginField' id='$this->_loginUserName' name='$this->_loginUserName' size='20' /></label><br/>
-							<label for='$this->_loginPassword' ><br /><input type='password' class='loginPassField' id='$this->_loginPassword' name='$this->_loginPassword' size='20' /></label><br/>
+							<label for='$this->_loginUserName'><br /><input type='text' defaultValue='Login name' class='loginLoginField default' id='$this->_loginUserName' name='$this->_loginUserName' size='20' /></label><br/>
+							<label for='$this->_loginPassword'><br /><input type='password' class='loginPassField default' defaultValue='Type your password' id='$this->_loginPassword' name='$this->_loginPassword' size='20' /></label><br/>
 							<div id='loginButtonDiv'>
                                 <input type='submit' class='loginButton' id='$this->_loginButton' name='$this->_loginButton' value='Login' />
 							</div>

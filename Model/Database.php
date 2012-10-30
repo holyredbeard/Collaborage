@@ -72,14 +72,15 @@ class Database {
             throw new \Exception($this->mysqli->error);
         }
         
-        if ($stmt->bind_result($userId, $username, $password) == FALSE) {
+        if ($stmt->bind_result($userId, $username, $password, $isAdmin) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
 
         if ($stmt->fetch()) {
 
             $user = array('userId' => $userId,
-                          'username' => $username);
+                          'username' => $username,
+                          'isAdmin' => $isAdmin);
 
             return $user;
         } else {
@@ -130,7 +131,7 @@ class Database {
         $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($field1, $field2, $field3) == FALSE) {
+        if ($stmt->bind_result($field1, $field2, $field3, $field4) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -143,6 +144,25 @@ class Database {
         $stmt->Close();
         
         return $userArray;
+    }
+
+    public function CheckIfAdmin($stmt) {
+
+        if ($stmt->execute() == false) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        if ($stmt->bind_result($isAdmin) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        if ($stmt->fetch()) {
+            return $isAdmin;
+        }
+        else {
+            return null;       // Ingen match i databasen
+        }
+
     }
 
     /*
@@ -164,7 +184,7 @@ class Database {
         $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $isPublic) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -174,8 +194,7 @@ class Database {
                            'userId' => $userId,
                            'listName' => $listName,
                            'creationDate' => $creationDate,
-                           'expireDate' => $expireDate,
-                           'isPublic' => $isPublic);
+                           'expireDate' => $expireDate);
         }
         
         $stmt->Close();
@@ -183,7 +202,7 @@ class Database {
         return $lists;
     }
 
-    public function GetAssignedLists($stmt) {
+    public function GetLists($stmt) {
         
         if ($stmt === FALSE) {
                 throw new \Exception($this->mysqli->error);
@@ -196,7 +215,7 @@ class Database {
         $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $isPublic) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -206,8 +225,7 @@ class Database {
                            'userId' => $userId,
                            'listName' => $listName,
                            'creationDate' => $creationDate,
-                           'expireDate' => $expireDate,
-                           'isPublic' => $isPublic);
+                           'expireDate' => $expireDate);
         }
         
         $stmt->Close();
@@ -226,7 +244,6 @@ class Database {
         }
 
         if ($stmt->fetch()) {
-
             $isFinished = $result;
 
             return $isFinished;
@@ -234,6 +251,28 @@ class Database {
         else {
             return null;       // Ingen match i databasen
         }
+    }
+
+    public function AllHasSorted($stmt) {
+
+        $allHasSorted = true;
+        echo "JAPP $allHasSorted      ";
+
+        if ($stmt->execute() == false) {
+            throw new \Exception($this->mysqli->error);
+        }
+        
+        if ($stmt->bind_result($result) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        while ($stmt->fetch()) {
+            if ($result == 0) {
+                $allHasSorted = 0;
+            }
+        }
+
+        return $allHasSorted;
     }
 
     public function CheckListStatus($stmt) {
@@ -346,7 +385,7 @@ class Database {
         }
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $isPublic, $listCreator) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $listCreator) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -357,7 +396,6 @@ class Database {
                                  'listName' => $listName,
                                  'creationDate' => $creationDate,
                                  'expireDate' => $expireDate,
-                                 'isPublic' => $isPublic,
                                  'listCreator' => $listCreator);
         }
         

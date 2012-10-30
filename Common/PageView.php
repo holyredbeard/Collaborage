@@ -11,8 +11,8 @@ namespace Common;
 class PageView {
   
   // Config for page
-  private $m_cssFiles = array('style.css', 'jquery-ui-1.9.0.custom.css', 'jquery-ui-1.9.0.custom.min.css');
-  private $m_jsFiles= array('jquery-1.8.2.js', 'jquery-1.7.1.js', 'jquery-1.8.2.min.js', 'jquery-ui-1.9.0.custom.min.js', 'jquery-ui-1.9.0.custom.js', 'external.js');
+  private $m_cssFiles = array('style.css', 'jquery-ui-1.9.0.custom.css', 'jquery-ui-1.9.0.custom.min.css', 'tipsy.css');
+  private $m_jsFiles= array('jquery-1.8.2.js', 'jquery-1.7.1.js', 'jquery-1.8.2.min.js', 'jquery-ui-1.9.0.custom.min.js', 'jquery-ui-1.9.0.custom.js', 'external.js', 'jquery.tipsy.js');
 
   // TODO: change to const?
   private $m_cssFolder = 'css';

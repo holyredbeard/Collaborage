@@ -70,10 +70,15 @@ session_start();
 
             $actionType = $URLQueryView->GetType();
 
+            $user = $loginHandler->GetStoredUser();
+
+            $isAdmin = $loginHandler->CheckIfAdmin($user['userId']);
+
             if ($actionType == 'list'){
                 $body .= $listController->DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn);
             }
-            else if (($actiontype == 'admin') && ($IsLoggedIn == true)) {
+
+            else if (($actionType == 'admin') && ($IsLoggedIn) && ($isAdmin)) {
                 $body .= $userController->DoControl($userHandler, $userView);
             }
 

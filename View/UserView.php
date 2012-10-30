@@ -39,14 +39,17 @@ class UserView {
 						</label>";
 		}
 		
-		$userList = "<div id='userList'>
-						<form id='form3' method='post' action=''>
-							<fieldset>
-								<p><h3>Delete users</h3></p>
-								<p>$users</p>
-								<input type='submit' id='$this->_submitRemove' name='$this->_submitRemove' Value='Delete' />
-							</fieldset>
-						</form>
+		$userList = "<div id='listContainer'>
+						<h2>Admin area</h2>
+						<div id='userList'>
+							<form id='form3' method='post' action=''>
+								<fieldset>
+									<p><h3>Users</h3></p>
+									<p>$users</p>
+									<input type='submit' id='$this->_submitRemove' name='$this->_submitRemove' Value='Delete' />
+								</fieldset>
+							</form>
+						</div>
 					</div>";
 
 		return $userList;

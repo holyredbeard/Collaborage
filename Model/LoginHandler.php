@@ -40,6 +40,21 @@ class LoginHandler {
 		//return isset($_SESSION[$this->m_storedUser]) ? $_SESSION[$this->m_storedUser] : false;
 	}
 
+	public function CheckIfAdmin($userId) {
+
+
+		$query = "SELECT isAdmin
+					FROM user
+					WHERE userId = ?";
+
+		$stmt = $this->m_db->Prepare($query);
+		$stmt->bind_param("i", $userId);
+
+		$isAdmin = $this->m_db->CheckIfAdmin($stmt);
+
+		return $isAdmin;
+	}
+
 	/**
 	 * Logga in användaren
 	 * 

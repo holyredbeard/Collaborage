@@ -29,6 +29,7 @@ body.index2 {
 #mainContainer {
 	margin-top: 60px;
 	margin-bottom: 60px;
+
 }
 
 /* HEADER */
@@ -65,6 +66,12 @@ footer {
 	color: white;
 }
 
+li.userList {
+	list-style: none;
+	position: relative;
+	left: -35px;
+}
+
 ul.menu{
   margin: 0px;
   padding: 2px;
@@ -99,25 +106,30 @@ ul.menu li.menu a:hover{
 }​
 
 ul.notSorted, li.notSorted, li.doneSorted {
-  width: 430px;
-  background: #888;
+  color: white;
+  margin-top: 5px;
+  padding: 10px 10px 10px 15px;
+  border-radius: 3px;
+  background: #934152;
+  width: 410px;
+  height: 25px;
   display: block;
   text-decoration: none;
   font-size: 12px;
   list-style: none;
-  padding: 5px;
   border-radius: 2px;
-}
-
-ul.notSorted:hover {
-	cursor: pointer;
-	border: 1px dashed black;
-	background: #999;
-	width: 400px;
+  border: 3px solid rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box; /* for Safari */
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 li.notSorted:hover {
-	margin-left: -40px;
+	color: white;
+	background: #6E404A;
+	cursor: move;
+	  border: 3px solid rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box; /* for Safari */
+  background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 li.notSorted {
@@ -151,10 +163,13 @@ ul.doneSorted {
 .listObjectShow {
 	margin-top: 5px;
 	padding: 10px 10px 10px 15px;
-	background: #777;
 	border-radius: 3px;
+	background: #934152;
 	width: 400px;
 	height: 25px;
+	border: 3px solid rgba(0, 0, 0, 0.2);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 .listObjectRemove {
@@ -170,6 +185,7 @@ form, fieldset {
 }
 
 #listOfListObjects{
+	color: white;
 	margin-top: 10px;
 }
 
@@ -194,7 +210,7 @@ input[type=text] {
     -webkit-box-shadow: inset 2px 2px 2px 0px #dddddd;
     -moz-box-shadow: inset 2px 2px 2px 0px #dddddd;
     box-shadow: inset 2px 2px 2px 0px #dddddd;
-    margin: 10px;
+    margin: 5px;
     overflow: auto;
     padding: 2px 2px 2px 7px;
     width: 200px;
@@ -215,8 +231,12 @@ input.active {
 	margin-bottom: 5px;
 }
 
-.assigned {
+h3.assigned, h3.usersLists {
 	margin-top: 25px;
+}
+
+h3.listInfo {
+	margin-top: 100px;
 }
 
 .list {
@@ -235,6 +255,17 @@ input.active {
 	color: #9b2028;
 }
 
+.userName {
+ clear: both;
+ float: left;
+ width: 30%;
+}
+
+.userStatus {
+ float: left;
+ width: 55%;
+}
+
 #newListContainer {
 	color: #555;
 	background: #fff;
@@ -248,7 +279,7 @@ input.active {
 }
 
 #listContainer {
-	color: #ff923b;
+	color: #2E4F45;
 	background: #fff;
 	position: relative;
 	top: 20px;
@@ -268,10 +299,6 @@ input.active {
 }
 
 #newListObjectsDiv {
-}
-
-#addUsers {
-	display: none;
 }
 
 #loginMenu {
@@ -349,9 +376,9 @@ input.active {
 
 #logoutButton {
 	position: absolute;
-	top: 0px;
+	top: 8px;
 	right: 40px;
-
+	z-index: 2000;
 }
 
 #rememberMeDiv {
@@ -382,7 +409,7 @@ input.active {
 
 #loginForm {
 	color: #555;
-	height: 220px;
+	height: 245px;
 	z-index: 1100;
 	position: absolute;
 	top: -165px;
@@ -414,7 +441,9 @@ input.active {
 }
 
 .loginLoginField {
-	width: 190px;
+	position: relative;
+	right: 5px;
+	width: 190px !important;
 	height: 25px;
 	color: #888;
 	padding-left: 5px;
@@ -431,19 +460,13 @@ input.active {
 	right: 75px;
 }
 
-#logout {
-	position: relative;
-	top: -52px;
-	z-index: 1200;
-}
-
 #container {
 	margin:0px auto;
 	width: 200px;
 }
 
 #logout {
-	float: right;
+
 }
 
 #loginText {
