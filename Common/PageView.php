@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Common;
 
 /**
@@ -9,6 +8,13 @@ namespace Common;
  **/
 
 class PageView {
+
+  // Titles
+  const TITLE_CREATE_NEW_LIST = 'Create new list';
+  const NOT_LOGGED_IN = 'Please log in';
+  const VIEW_LIST = 'List view';
+  const SHOW_LIST = 'Show list';
+  const LIST_SAVED = 'List was saved!';
   
   // Config for page
   private $m_cssFiles = array('style.css', 'jquery-ui-1.9.0.custom.css', 'jquery-ui-1.9.0.custom.min.css', 'tipsy.css');
@@ -20,6 +26,13 @@ class PageView {
   //const IMG_FOLDER = '/img';
 
   private $m_charset = 'utf-8';
+
+  private $m_title = '';
+
+  public function setTitle($title) {
+
+    $this->m_title = $title;
+  }
   
   /**
   * Adds a CSS stylesheet to the head of the document
@@ -53,10 +66,12 @@ class PageView {
   * @param string $body    
   * @return string     
   **/
-  public function GetHTMLPage($title, $header, $body) {
+  public function GetHTMLPage($header, $body) {
     
         $css = $this->AddStyleSheet();
         $js = $this->AddJavaScript();
+
+        $title = $this->m_title;
         
         $html = "
               <!DOCTYPE HTML SYSTEM>

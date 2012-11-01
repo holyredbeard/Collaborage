@@ -4,15 +4,16 @@ namespace Controller;
 
 require_once ('View/ListView.php');
 require_once ('Model/ListHandler.php');
+require_once('Common/PageView.php');
 
 class ListController {
-
 	
-	public function DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn) {
+	public function DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn, $pageView, $validation) {
 		$listView = new \View\ListView();
 		$listHandler = new \Model\ListHandler($db);
 		$userHandler = new \Model\UserHandler($db);
 		$loginHandler = new \Model\loginHandler($db);
+		$validation = new \Model\ValidationHandler();
 
 		$user = $loginHandler->GetStoredUser();
 
@@ -22,20 +23,38 @@ class ListController {
 			case 'newList':
 				if ($IsLoggedIn) {
 					if ($listView->WantToCreateList()) {
-						$list = $listView->GetNewList($loginHandler, $user);
+						$listName = $listView->GetListName();
+						$listObjects = $listView->GetListObjects();
+						$listObjectDescs = $listView->GetListObjectDescs();
+						$userCheckBoxes = $listView->GetListUsers();
+						$checkValidation = $validation->DoValidateList($listName, $listObjects, /*$listObjectDescs, */$userCheckBoxes);
 
-						if ($list != null) {
-							$list = $listHandler->SaveNewList($list);
+						if ($checkValidation) {
+							$list = $listHandler->GenerateListArray($user, $listName, $listObjects, $listObjectDescs, $userCheckBoxes);
 
-							$output = $listHandler->ShowList($list['listId'], $listView, false, false, $user);
+							if ($list != null) {
+								$list = $listHandler->SaveNewList($list);
+
+								$output = $listHandler->ShowList($list['listId'], $listView, false, false, $user, null);
+							}
+						}
+						else {
+							$errors = $validation->GetValidationError();
+
+							$users = $userHandler->GetAllUsers();
+							$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler, $errors);
 						}
 					}
 					else {
+						$pageView->setTitle(\Common\PageView::TITLE_CREATE_NEW_LIST);
+
 						$users = $userHandler->GetAllUsers();
-						$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler);
+						$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler, null);
 					}
 				}
 				else {
+					$pageView->setTitle(\Common\PageView::NOT_LOGGED_IN);
+
 					$output .= $listView->ShowNotLoggedIn();
 				}
 
@@ -46,6 +65,8 @@ class ListController {
 				if ($IsLoggedIn) {
 					$assignedLists = $listHandler->GetAssignedLists($user['userId']);
 					$usersLists = $listHandler->GetUsersLists($user['userId']);
+
+					$pageView->setTitle(\Common\PageView::VIEW_LIST);
 
 					$output .= $listView->ShowAllLists($assignedLists, $usersLists, $IsLoggedIn);
 				}
@@ -84,6 +105,10 @@ class ListController {
 				//$listIsDone = $listHandler->CheckListStatus($listId);
 
 				// Show the list!
+				// 
+				//PageView::$m_title = 'TITLE!';
+				$pageView->setTitle(\Common\PageView::SHOW_LIST);
+
 				$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, $allHasSorted, $user);
 
 				break;
@@ -97,6 +122,8 @@ class ListController {
 				// check if the list sorting is done
 				$allHasSorted = $listHandler->CheckListStatus($listId);
 				
+				$pageView->setTitle(\Common\PageView::LIST_SAVED);
+
 				$output .= $listHandler->ShowList($listId, $listView, true, $allHasSorted, $user);
 
 				break;

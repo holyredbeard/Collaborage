@@ -9,7 +9,7 @@ class UserController {
 	private $_userIdArray = array();	// lagrar hämtade användar-ids
 	private $_userNameArray = array();	// lagrar hämtade användarnamn
 	
-	public function DoControl(\Model\UserHandler $userHandler, \View\UserView $userView) {
+	public function DoControl(\Model\UserHandler $userHandler, \View\UserView $userView, \Common\PageView $pageView) {
 
 		$xhtml = "";
 		$userArray = array();
@@ -23,9 +23,11 @@ class UserController {
 
 				// Visar meddelanden för användaren om hur det gick
 				if ($removeTry) {
+
 					$xhtml = \View\UserView::USER_REMOVED;
 				}
 				else {
+
 					$xhtml = \View\UserView::FAILED_TO_REMOVE_USER;
 				}
 			}
@@ -33,6 +35,9 @@ class UserController {
 
 		// Hämtar användarna igen och visar för användaren
 		$userArray = $userHandler->GetAllUsers();
+
+		$title = 'List of users';
+		$pageView->setTitle($title);
 
 		$xhtml .= $userView->ShowUsers($userArray);
 

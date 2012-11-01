@@ -6,11 +6,11 @@ require_once('View/HeaderView.php');
 
 class HeaderController {
 	
-	public function DoControl($isLoggedIn) {
+	public function DoControl($isLoggedIn, $isAdmin) {
 
 		$headerView = new \View\HeaderView();
 
-		$header = $headerView->GetMenu($isLoggedIn);
+		$header = $headerView->GetMenu($isLoggedIn, $isAdmin);
 
 		return $header;
 	}

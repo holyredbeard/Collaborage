@@ -2,7 +2,7 @@
 
 namespace Controller;
 
-require_once ('Model/Validation.php');
+require_once ('Model/ValidationHandler.php');
 
 class RegisterController {
 
@@ -12,7 +12,7 @@ class RegisterController {
                               \Model\LoginHandler $loginHandler,
                               \Model\UserHandler $userHandler) {
 
-        $validation = new \Model\Validation();
+        $validation = new \Model\ValidationHandler();
         $loginView = new \View\loginView();
         $loginController = new \Controller\loginController();
 
@@ -53,7 +53,7 @@ class RegisterController {
 
                 // Validerar användarnamn och lösenord
                 $validation = new \Model\Validation();
-                $validate = $validation->DoValidate($regUsername, $regPassword, $regPassword2);
+                $validate = $validation->DoValidateRegistering($regUsername, $regPassword, $regPassword2);
 
                 // Gick valideringen inte igenom avbryts registreringen
                 if (!$validate) {

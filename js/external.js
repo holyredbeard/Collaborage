@@ -31,77 +31,144 @@ var Capsule = {
     	var i = 0;
 
     	$('#addListObjectSubmit').click(function (e) {
+            if (($('#listObjectName').val()) != 'List object name') {
 
-    		var listObjectName = $('#listObjectName').val();
+                var listObjectName = $('#listObjectName').val();
 
-    		$('#listObjectName').val('');
+                if((listObjectName == null) || (listObjectName == '')) {
+                    return false;
+                }
+                else {
+                    var listObjectDesc = $('#newListObjectDesc').val();
+                    $('#newListObjectDesc').val('');
 
-    		if((listObjectName == null) || (listObjectName == '')) {
-    			return false;
-    		}
-    		else {
-    			var listObjectDesc = $('#m_newListObjectDesc').val();
-    			$('#m_newListObjectDesc').val('');
+                    var listDiv = 'listDiv' + i;
 
-    			var listDiv = 'listDiv' + i;
+                    $('<div>', {
+                        class: 'listObjectShow',
+                        id: listDiv
+                    }).appendTo('#listOfListObjects');
 
-    			$('<div>', {
-    				class: 'listObjectShow',
-    				id: listDiv
-    			}).appendTo('#listOfListObjects');
+                    $('<span>', {
+                        class: 'listObjectShowText',
+                        id: 'listObjectName' + i,
+                        text: listObjectName
+                    }).appendTo('#' + listDiv);
 
-    			$('<span>', {
-    				class: 'listObjectShowText',
-    				id: 'listObjectName' + i,
-    				text: listObjectName
-    			}).appendTo('#' + listDiv);
+                    $('<br>', {
+                        class: 'listObjectShowDesc',
+                        id: 'listObjectDesc' + i,
+                        text: listObjectDesc
+                    }).appendTo('#' + listDiv);
 
-    			$('<br>', {
-    				class: 'listObjectShowDesc',
-    				id: 'listObjectDesc' + i,
-    				text: listObjectDesc
-    			}).appendTo('#' + listDiv);
+                    $('<span>', {
+                        class: 'listObjectShowDesc',
+                        id: 'listObjectDesc' + i,
+                        text: listObjectDesc
+                    }).appendTo('#' + listDiv);
 
-    			$('<span>', {
-    				class: 'listObjectShowDesc',
-    				id: 'listObjectDesc' + i,
-    				text: listObjectDesc
-    			}).appendTo('#' + listDiv);
+                    $('<img>', {
+                        href: '#',
+                        src: 'http://cdn1.iconfinder.com/data/icons/cc_mono_icon_set/blacks/16x16/delete.png',
+                        class: 'listObjectRemove',
+                        id: 'removeListObject' + i,
+                        text: 'X'
+                    }).appendTo('#' + listDiv);
 
-    			$('<span>', {
-    				href: '#',
-    				class: 'listObjectRemove',
-    				id: 'removeListObject' + i,
-    				text: 'X'
-    			}).appendTo('#' + listDiv);
+                    $('<input>', {
+                        type: 'hidden',
+                        class: 'removeListObject' + i,
+                        name: 'newListObject[]',
+                        id: 'listObjectName' + i,
+                        value: listObjectName
+                    }).appendTo('#listOfListObjects');
 
-    			$('<input>', {
-    				type: 'hidden',
-    				class: 'removeListObject' + i,
-    				name: 'newListObject[]',
-    				id: 'listObjectName' + i,
-    				value: listObjectName
-    			}).appendTo('#listOfListObjects');
+                    $('<input>', {
+                        type: 'hidden',
+                        class: 'removeListObject' + i,
+                        name: 'newListObjectDesc[]',
+                        id: 'listObjectDesc' + i,
+                        value: listObjectDesc
+                    }).appendTo('#listOfListObjects');
+                }
 
-    			$('<input>', {
-    				type: 'hidden',
-    				class: 'removeListObject' + i,
-    				name: 'newListObjectDesc[]',
-    				id: 'listObjectDesc' + i,
-    				value: listObjectDesc
-    			}).appendTo('#listOfListObjects');
-    		}
+                $('#listObjectName').val('List object name');
+                $('#newListObjectDesc').val('List object description');
 
-    		i += 1;
+                i += 1;
+
+            }
+            else {
+                if ($('.addListObjectName').length == 0){
+                    $('<span>', {
+                        class: 'errorMessage addListObjectName',
+                        text: 'You need to give the list object a name!'
+                    }).appendTo('#errorMessages');        
+
+                   $('<br>').appendTo('#errorMessages');                 
+                }
+            }
 
     		return false;
     		e.preventdefault();
     	});
 
-		$('#submit').live('click', function(){
-            alert('sdf');
+        // error messages
+        // 
+
+		$('#submit').live('click', function(e){
+
+            var validation = true;
+
+            /*if ($('#listName').val() == 'List name') {
+
+                if ($('.addListName').length == 0){
+                    $('<span>', {
+                        class: 'errorMessage addListName',
+                        text: 'You need to provide a name for the list!'
+                    }).appendTo('#errorMessages');        
+
+                   $('<br>').appendTo('#errorMessages');
+                }
+                validation = false;
+            }
+
+            if($('.listObjectShow').length < 2) {
+
+                if ($('.addObjects').length == 0){
+                    $('<span>', {
+                        class: 'errorMessage addObjects',
+                        text: 'You need to add at least two list objects!'
+                    }).appendTo('#errorMessages');
+
+                    $('<br>').appendTo('#errorMessages');
+                }
+                validation = false;
+            }
+
+            if ($('input[name^="m_newListUser[]"]:checked').length < 2) {
+
+                if ($('.addUsers').length == 0){
+                    $('<span>', {
+                        class: 'errorMessage addUsers',
+                        text: 'You need to choose at least two users!'
+                    }).appendTo('#errorMessages');        
+
+                   $('<br>').appendTo('#errorMessages');
+                }
+                validation = false;
+            }
+
+            if (validation == false) {
+                return false;
+            }*/
+
 			e.preventdefault();
 		});
+
+        $('#listObjectName').focus(function() {
+            $('#errorMessages').text('');
+        });
 
 		$('.listObjectRemove').live('click',function(){
 			var id = $(this).attr('id');
@@ -170,10 +237,6 @@ var Capsule = {
 			}
         });
         $("ul, li, #loginMenu").disableSelection();
-   	
-    	$(function() {
-        	$('#datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
-    	});
 
 		$('input[type=text]').focus(function() {
 			$(this).val('');

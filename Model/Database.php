@@ -181,10 +181,9 @@ class Database {
         if ($stmt->execute() == FALSE) {
                 throw new \Exception($this->mysqli->error);
         }
-        $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -193,8 +192,7 @@ class Database {
             $lists[] = array('listId' => $listId,
                            'userId' => $userId,
                            'listName' => $listName,
-                           'creationDate' => $creationDate,
-                           'expireDate' => $expireDate);
+                           'creationDate' => $creationDate);
         }
         
         $stmt->Close();
@@ -215,7 +213,7 @@ class Database {
         $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -224,8 +222,7 @@ class Database {
             $lists[] = array('listId' => $listId,
                            'userId' => $userId,
                            'listName' => $listName,
-                           'creationDate' => $creationDate,
-                           'expireDate' => $expireDate);
+                           'creationDate' => $creationDate);
         }
         
         $stmt->Close();
@@ -256,7 +253,6 @@ class Database {
     public function AllHasSorted($stmt) {
 
         $allHasSorted = true;
-        echo "JAPP $allHasSorted      ";
 
         if ($stmt->execute() == false) {
             throw new \Exception($this->mysqli->error);
@@ -385,7 +381,7 @@ class Database {
         }
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $expireDate, $listCreator) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $listCreator) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -395,7 +391,6 @@ class Database {
                                  'userId' => $userId,
                                  'listName' => $listName,
                                  'creationDate' => $creationDate,
-                                 'expireDate' => $expireDate,
                                  'listCreator' => $listCreator);
         }
         
@@ -429,6 +424,39 @@ class Database {
                                  'listElemDesc' => $listElemDesc,
                                  'listElemOrderPlace' => $listElemOrderPlace);
         }
+        
+        $stmt->Close();
+
+        return $listElements;
+    }
+
+    public function GetOrderedElements(\mysqli_stmt $stmt) {
+
+        if ($stmt === FALSE) {
+                throw new \Exception($this->mysqli->error);
+        }
+        
+        //execute the statement
+        if ($stmt->execute() == FALSE) {
+                throw new \Exception($this->mysqli->error);
+        }
+            
+        //Bind the $ret parameter so when we call fetch it gets its value
+        if ($stmt->bind_result($listElemId, $listElemName, $listElemDesc, $listElemOrderPlace) == FALSE) {
+            throw new \Exception($this->mysqli->error);
+        }
+
+        $listElements = array();
+        
+        // Hämtar ids och användarnamn och lägger i arrayen.
+        while ($stmt->fetch()) {
+            $listElements[] = array('listElemId' => $listElemId,
+                                 'listElemName' => $listElemName,
+                                 'listElemDesc' => $listElemDesc,
+                                 'listElemOrderPlace' => $listElemOrderPlace);
+        }
+
+        var_dump($listElements);
         
         $stmt->Close();
 

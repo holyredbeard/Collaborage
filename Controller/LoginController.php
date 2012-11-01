@@ -14,7 +14,8 @@ class LoginController {
 	public function DoControl(\Model\LoginHandler $loginHandler,
                               \View\LoginView $loginView,
                               \View\RegisterView $registerView,
-                              \Model\EncryptionHandler $encryptionHandler) {
+                              \Model\EncryptionHandler $encryptionHandler,
+                              \Common\PageView $pageView) {
 
 		$controlInfo = '';
 
@@ -33,6 +34,7 @@ class LoginController {
             // Har användaren inte försökt logga ut visas logout-knappen
     		else {
     			$loginView->DoLogoutBox();
+                echo 'gs';
     		}
     	}
 
@@ -74,9 +76,15 @@ class LoginController {
         // Kontrollerar åter om användaren är inloggad, och om så är fallet läggs logout-knappen till $xhtml-variabeln.
         // I annat fall läggs login-formuläret till $xhtml-variabeln.
         if ($loginHandler->IsLoggedIn()){
+            $title = 'You are logged in';
+            $pageView->setTitle($title);
+
         	$xhtml = $loginView->DoLogoutBox();
         }
         else {
+            $title = 'Collaborage!';
+            $pageView->setTitle($title);
+
             $regButton = $registerView->DoRegisterButton();
         	$xhtml = $loginView->DologinBox($regButton);
         }

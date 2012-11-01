@@ -6,13 +6,33 @@ class ListHandler {
 
 	private $m_db = null;
 
+	// Tabellnamn
+	private $m_tableUser = 'user';
+	private $m_tableListUser = 'listUser';
+	private $m_tableList = 'list';
+	private $m_tableListElement = 'listElement';
+	private $m_tableListElemOrder = 'listElemOrder';
+
+	// Kolumner
+	private $m_columnListId = 'listId';
+
+	private $m_columnUserId = 'userId';
+	private $m_columnListName = 'listName';
+	private $m_columnCreationDate = 'creationDate';
+	private $m_columnListElemId = 'listElemId';
+	private $m_columnListElemOrderPlace = 'listElemOrderPlace';
+	private $m_columnIsFinished = 'isFinished';
+	private $m_columnListElemName = 'listElemName';
+	private $m_columnListElemDesc = 'listElemDesc';
+
+
 	public function __construct(Database $db) {
 		$this->m_db = $db;
 	}
 
 	public function GetAllLists($listView) {
 
-		$query = "SELECT * FROM list";
+		$query = "SELECT * FROM $this->$m_tableList";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -23,9 +43,9 @@ class ListHandler {
 
 	public function GetAssignedLists($userId) {
 
-		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, l.expireDate
-					FROM list AS l
-	                INNER JOIN listUser AS lu
+		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate
+					FROM $this->m_tableList AS l
+	                INNER JOIN $this->m_tableListUser AS lu
 	                ON l.listId = lu.listId
 	                WHERE lu.userId = ?";
 
@@ -41,8 +61,8 @@ class ListHandler {
 	public function GetUsersLists($userId) {
 
 		$query = "SELECT *
-					FROM list
-					WHERE userId = ?";
+					FROM $this->m_tableList
+					WHERE $this->m_columnUserId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -53,16 +73,48 @@ class ListHandler {
 		return $usersLists;
 	}
 
+	public function GenerateListArray($user, $listName, $listObjectNames, $listObjectDescs, $userCheckBoxes) {
+
+		$userId = $user['userId'];
+		$checkedUsers = array();
+
+		$date = getdate();
+		$creationDate = $date['year'] . $date['mon'] . $date['mday'];
+
+		$nrOf = count($listObjectNames);
+
+		for($i = 0; $i < $nrOf; $i++) {
+			$listObjectName = $listObjectNames[$i];
+
+			$listObjectDesc = $listObjectDescs[$i];
+
+			$listObjects[] = array('listObjectName' => $listObjectName,
+								 'listObjectDesc' => $listObjectDesc);
+		}
+
+		foreach($userCheckBoxes as $user) {
+        	$checkedUsers[] = $user;
+    	}
+
+		$newList = array('listName' => $listName,
+						 'creationDate' => $creationDate,
+						 'listObjects' => $listObjects,
+						 'checkedUsers' => $checkedUsers,
+						 'userId' => $userId);
+
+		return $newList;
+	}
+
 	public function SaveNewList($list) {
 
-		$query = "INSERT INTO list (userId, listName, creationDate, expireDate) VALUES(?, ?, ?, ?)";
+		$query = "INSERT INTO $this->m_tableList ($this->m_columnUserId, $this->m_columnListName, $this->m_columnCreationDate)
+					VALUES(?, ?, ?)";
 
 		$stmt = $this->m_db->Prepare($query);
 
-		$stmt->bind_param("isss", $list['userId'],
+		$stmt->bind_param("iss", $list['userId'],
 								   $list['listName'],
-								   $list['creationDate'],
-								   $list['expireDate']);
+								   $list['creationDate']);
 
 		$listId = $this->m_db->CreateNewList($stmt);
 
@@ -86,7 +138,8 @@ class ListHandler {
 		$i = 0;
 		foreach ($listOrderArray as $listElem) {
 
-			$query = "INSERT INTO listElemOrder (listId, listElemId, userId, listElemOrderPlace) VALUES(?, ?, ?, ?)";	
+			$query = "INSERT INTO $this->m_tableListElemOrder ($this->m_columnListId, $this->m_columnListElemId, $this->m_columnUserId, $this->m_columnListElemOrderPlace)
+						VALUES(?, ?, ?, ?)";	
 
 			$stmt = $this->m_db->Prepare($query);
 
@@ -104,9 +157,9 @@ class ListHandler {
 			$i += 1;
 		}
 
-		$query = "UPDATE listUser SET isFinished = ?
-				  WHERE listId = ?
-				  AND userId = ?";
+		$query = "UPDATE $this->m_tableListUser SET $this->m_columnIsFinished = ?
+				  WHERE $this->m_columnListId = ?
+				  AND $this->m_columnUserId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -125,7 +178,8 @@ class ListHandler {
 			$listObjectName = $listObject['listObjectName'];
 			$listObjectDesc = $listObject['listObjectDesc'];
 
-			$query = "INSERT INTO listElement (listElemName, listId, listElemDesc) VALUES(?, ?, ?)";
+			$query = "INSERT INTO $this->m_tableListElement ($this->m_columnListElemName, $this->m_columnListId, $this->m_columnListElemDesc)
+						VALUES(?, ?, ?)";
 
 			$stmt = $this->m_db->Prepare($query);
 
@@ -143,7 +197,8 @@ class ListHandler {
 	public function InsertListUsers($listId, $checkedUsers) {
 
 		foreach ($checkedUsers as $checkedUser) {
-			$query = "INSERT INTO listUser (listId, userId) VALUES(?, ?)";
+			$query = "INSERT INTO $this->m_tableListUser ($this->m_columnListId, $this->m_columnUserId)
+						VALUES(?, ?)";
 
 			$stmt = $this->m_db->Prepare($query);
 
@@ -155,9 +210,9 @@ class ListHandler {
 
 	public function HasFinishedSorting($userId, $listId) {
 
-		$query = "SELECT isFinished FROM listUser
-					WHERE userId = ?
-					AND listId = ?";
+		$query = "SELECT $this->m_columnIsFinished FROM $this->m_tableListUser
+					WHERE $this->m_columnUserId = ?
+					AND $this->m_columnListId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -170,9 +225,9 @@ class ListHandler {
 
 	public function AllHasSorted($listId) {
 
-		$query = "SELECT isFinished
-				  FROM listUser
-				  WHERE listId = ?";
+		$query = "SELECT $this->m_columnIsFinished
+				  FROM $this->m_tableListUser
+				  WHERE $this->m_columnListId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -185,8 +240,8 @@ class ListHandler {
 
 	public function CheckListStatus($listId) {
 
-		$query = "SELECT isFinished FROM listUser
-					WHERE listId = ?";
+		$query = "SELECT $this->m_columnIsFinished FROM $this->m_tableListUser
+					WHERE $this->m_columnListId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -201,7 +256,13 @@ class ListHandler {
 
 		$listOptions = $this->GetListOptions($listId);		// : Array
 
-		$listElements = $this->GetListElements($listId);		// : Array
+		if ($userIsFinished) {
+			$listElements = $this->GetOrderedElements($theUser['userId'], $listId);		// : Array
+		}
+		else {
+			$listElements = $this->GetListElements($listId);		// : Array
+		}
+
 		$listUsers = $this->GetListUsers($listId);			// : Var
 
 		$list = array('listId' => $listId,
@@ -217,9 +278,9 @@ class ListHandler {
 	// KLAR!
 	public function GetListOptions($listId) {
 		
-		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, .l.expireDate, u.username
-					FROM list AS l
-					INNER JOIN user AS u
+		$query = "SELECT l.listId, l.userId, l.listName, l.creationDate, u.username
+					FROM $this->m_tableList AS l
+					INNER JOIN $this->m_tableUser AS u
 					ON l.userId = u.userId
 					WHERE l.listId=?";
 
@@ -236,8 +297,8 @@ class ListHandler {
 	// KLAR!
 	public function GetListElements($listId) {
 		
-		$query = "SELECT listElemId, listElemName, listElemDesc, listElemOrderPlace
-					FROM listElement
+		$query = "SELECT $this->m_columnListElemId, $this->m_columnListElemName, $this->m_columnListElemDesc, $this->m_columnListElemOrderPlace
+					FROM $this->m_tableListElement
 					WHERE listId=?
 					ORDER BY listElemOrderPlace";
 
@@ -250,11 +311,30 @@ class ListHandler {
 		return $listElements;
 	}
 
+	public function GetOrderedElements($userId, $listId) {
+
+		$query = "SELECT le.listElemId, le.listElemName, le.listElemDesc, lo.listElemOrderPlace
+					FROM $this->m_tableListElement AS le
+					INNER JOIN $this->m_tableListElemOrder AS lo
+					USING ($this->m_columnListId, $this->m_columnListElemId)
+					WHERE lo.userId = ?
+					AND lo.listId = ?
+					ORDER BY lo.listElemId";
+
+		$stmt = $this->m_db->Prepare($query);
+
+		$stmt->bind_param("ii", $userId, $listId);
+		
+		$listElements = $this->m_db->GetOrderedElements($stmt);
+
+		return $listElements;		
+	}
+
 	public function GetListUsersIds($listId) {
 
-		$query = "SELECT userId
-					FROM listUser
-					WHERE listId = ?";
+		$query = "SELECT $this->m_columnUserId
+					FROM $this->m_tableListUser
+					WHERE $this->m_columnListId = ?";
 
 		$stmt = $this->m_db->Prepare($query);
 
@@ -269,11 +349,11 @@ class ListHandler {
 
 		foreach ($listUsers as $listUser) {
 
-			$query = "SELECT listElemId, listElemOrderPlace
-						FROM listElemOrder
-						WHERE userId = ?
-						AND listId = ?
-						ORDER BY listElemId";
+			$query = "SELECT $this->m_columnListElemId, $this->m_columnListElemOrderPlace
+						FROM $this->m_tableListElemOrder
+						WHERE $this->m_columnUserId = ?
+						AND $this->m_columnListId = ?
+						ORDER BY $this->m_columnnListElemId";
 
 			$stmt = $this->m_db->Prepare($query);
 
@@ -285,8 +365,6 @@ class ListHandler {
 				$listOrders[] = $listOrder;
 			}
 		}
-
-		var_dump($listOrders);
 
 		return $listOrders;
 	}
@@ -326,8 +404,8 @@ class ListHandler {
 
 		foreach ($orderedList as $listElem) {
 
-			$query = "UPDATE listElement SET listElemOrderPlace = ?
-				  WHERE listElemId = ?";
+			$query = "UPDATE $this->m_tableListElement SET $this->m_columnListElemOrderPlace = ?
+				  WHERE $this->m_columnListElemId = ?";
 
 			$stmt = $this->m_db->Prepare($query);
 
@@ -346,8 +424,8 @@ class ListHandler {
 	public function GetListUsers($listId) {
 
 		$query = "SELECT lu.userId, u.username, lu.hasStarted, lu.isFinished
-					FROM listUser AS lu
-					INNER JOIN user as u
+					FROM $this->m_tableListUser AS lu
+					INNER JOIN $this->m_tableUser as u
 					ON lu.userId = u.userId
 					WHERE lu.listId=?";
 

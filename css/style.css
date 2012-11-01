@@ -32,6 +32,19 @@ body.index2 {
 
 }
 
+#mainViewContainer {
+	color: #555;
+	background: #fff;
+	border-radius: 3px;
+	padding: 10px 20px 20px 20px;
+	width: 600px;
+	min-height: 350px;
+	margin: 0px auto;
+	border: 6px solid rgba(0, 0, 0, 0.2);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
 /* HEADER */
 
 header {
@@ -64,6 +77,11 @@ footer {
 	font-size: 19px;
 	font-weight: bold;
 	color: white;
+}
+
+.logo {
+	color: white;
+	text-decoration: none;
 }
 
 li.userList {
@@ -173,11 +191,14 @@ ul.doneSorted {
 }
 
 .listObjectRemove {
+	float: right;
 	position: relative;
-	left: 370px;
+	right: 10px;
 	bottom: 10px;
-	background: blue;
+	cursor: pointer;
 }
+
+
 
 form, fieldset {
 	border: 0px;
@@ -231,12 +252,16 @@ input.active {
 	margin-bottom: 5px;
 }
 
-h3.assigned, h3.usersLists {
+h3.assigned, h3.usersLists, h3.mainView {
 	margin-top: 25px;
 }
 
 h3.listInfo {
 	margin-top: 100px;
+}
+
+h2, h3.listInfo, h3.assigned, h3.usersLists, h3.mainView {
+	color: #934152;
 }
 
 .list {
@@ -343,6 +368,29 @@ h3.listInfo {
     -moz-user-select:none;
     -ms-user-select:none;
     user-select:none;
+}
+
+.errorMessage {
+	position: relative;
+	top: 5px;
+	left: 10px;
+	color: red;
+
+	  column-width: 20px; /* not well-implemented yet. */
+	  -moz-column-width: 20px;
+	  -webkit-column-width: 20px;
+
+	  column-gap: 20px;
+	  -moz-column-gap: 20px;
+	  -webkit-column-gap: 20px;
+
+	  column-count: 3;
+	  -moz-column-count: 3;
+	  -webkit-column-count: 3;
+
+	  column-rule: 1px solid #000;
+	  -moz-column-rule: 1px solid #000;
+	  -webkit-column-rule: 1px solid #000;
 }
 
 .logoutButton {

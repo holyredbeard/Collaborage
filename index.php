@@ -10,12 +10,14 @@ session_start();
     require_once ('Model/LoginHandler.php');
     require_once ('Model/EncryptionHandler.php');
     require_once ('Model/UserHandler.php');
+    require_once ('Model/ValidationHandler.php');
 
   	//Views
   	require_once ('View/RegisterView.php');
     require_once ('View/LoginView.php');
     require_once ('View/UserView.php');
     require_once ('View/URLQueryView.php');
+    require_once ('View/MainView.php');
 
     // Controllers
     require_once ('Controller/RegisterController.php');
@@ -47,6 +49,7 @@ session_start();
             $loginView = new \View\LoginView();
             $userView = new \View\UserView();
             $URLQueryView = new \View\URLQueryView();
+            $mainView = new \View\MainView();
             
             $registerHandler = new \Model\RegisterHandler($db);
             $loginHandler = new \Model\LoginHandler($db);
@@ -59,13 +62,15 @@ session_start();
             $listController = new \Controller\ListController();
             $headerController = new \Controller\HeaderController();
 
+            $pageView = new \Common\PageView();
+
             $IsLoggedIn = $loginHandler->IsLoggedIn();
 
             if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
                 $body .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler);
             }
             else {
-                $body .= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler);
+                $body .= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler, $pageView);
             }
 
             $actionType = $URLQueryView->GetType();
@@ -75,11 +80,14 @@ session_start();
             $isAdmin = $loginHandler->CheckIfAdmin($user['userId']);
 
             if ($actionType == 'list'){
-                $body .= $listController->DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn);
+                $body .= $listController->DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn, $pageView, $validation);
             }
 
             else if (($actionType == 'admin') && ($IsLoggedIn) && ($isAdmin)) {
-                $body .= $userController->DoControl($userHandler, $userView);
+                $body .= $userController->DoControl($userHandler, $userView, $pageView);
+            }
+            else {
+                $body .= $mainView->ShowMainView();
             }
 
             // TODO: Ändra namn på filerna till AdminView etc...
@@ -87,12 +95,11 @@ session_start();
             //Close the database since it is no longer used
             $db->Close();
 
-            $header = $headerController->DoControl($loginHandler->IsLoggedIn());
+            $header = $headerController->DoControl($loginHandler->IsLoggedIn(), $isAdmin);
             //$footer = new \Controller\FooterController();
             
             //Generate output
-            $pageView = new \Common\PageView();
-            return $pageView->GetHTMLPage("Title", $header, $body);
+            return $pageView->GetHTMLPage($header, $body);
         }
     }
 

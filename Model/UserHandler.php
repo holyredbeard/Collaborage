@@ -53,7 +53,7 @@ class UserHandler {
 			}
 
 			$inPart = "(" . implode(",", $c) . ")";				// skapar sträng av '?' till queryn
-			$query = "DELETE FROM Users WHERE id IN $inPart";
+			$query = "DELETE FROM user WHERE userId IN $inPart";
 
 			$stmt = $this->m_db->Prepare($query);
 
