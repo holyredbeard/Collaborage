@@ -16,7 +16,6 @@ class ListController {
 		$validation = new \Model\ValidationHandler();
 
 		$user = $loginHandler->GetStoredUser();
-
 		$action = $URLQueryView->GetAction();
 
 		switch ($action) {
@@ -34,7 +33,8 @@ class ListController {
 
 							if ($list != null) {
 								$list = $listHandler->SaveNewList($list);
-
+								
+								//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
 								$output = $listHandler->ShowList($list['listId'], $listView, false, false, $user, null);
 							}
 						}
@@ -89,27 +89,13 @@ class ListController {
 
 				// If not finished, let's sort the list!
 				if ($allHasSorted == true) {
-					
-					$listUsers = $listHandler->GetListUsersIds($listId);
-
-					$listOrders = $listHandler->GetListOrders($listId, $listUsers);
-
-					$orderedList = $listHandler->CalculateOrder($listOrders);
-
-					$wasAdded = $listHandler->AddListElemOrderPlaces($orderedList);
+					$pageView->setTitle(\Common\PageView::SHOW_ORDERED_LIST);
+					$output .= $this->ShowOrderedList($listHandler, $listView, $listId);
 				}
-
-				//echo $allHasSorted . '< is allHasSorted';
-
-				// check if the list sorting is done
-				//$listIsDone = $listHandler->CheckListStatus($listId);
-
-				// Show the list!
-				// 
-				//PageView::$m_title = 'TITLE!';
-				$pageView->setTitle(\Common\PageView::SHOW_LIST);
-
-				$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, $allHasSorted, $user);
+				else {
+					$pageView->setTitle(\Common\PageView::SHOW_LIST);
+					$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, false, $user);
+				}
 
 				break;
 
@@ -117,18 +103,45 @@ class ListController {
 				$listOrder = $URLQueryView->GetListOrder();
 				$listId = $URLQueryView->GetListId();
 
-				$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
+				$userIsFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
+
+				if ($userIsFinished == false) {
+					$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
+					
+					$pageView->setTitle(\Common\PageView::LIST_SAVED);
+
+				}
 
 				// check if the list sorting is done
-				$allHasSorted = $listHandler->CheckListStatus($listId);
-				
-				$pageView->setTitle(\Common\PageView::LIST_SAVED);
+				$allHasSorted = $listHandler->AllHasSorted($listId);
 
-				$output .= $listHandler->ShowList($listId, $listView, true, $allHasSorted, $user);
+				// If not finished, let's sort the list!
+				if ($allHasSorted == true) {
+					$pageView->setTitle(\Common\PageView::SHOW_ORDERED_LIST);				
+					$output .= $this->ShowOrderedList($listHandler, $listView, $listId);
+				}
+
+				//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
+				$output .= $listHandler->ShowList($listId, $listView, true, false, $user);
 
 				break;
 		}
 
 		return $output;
 	}
+
+	public function ShowOrderedList($listHandler, $listView, $listId) {				
+			$listUsers = $listHandler->GetListUsersIds($listId);
+			$listOrders = $listHandler->GetListOrders($listId, $listUsers);
+
+			$orderedList = $listHandler->CalculateOrder($listOrders);
+
+			// TODO: Fixa så att de blir lika om samma poäng!
+			$wasAdded = $listHandler->AddListElemOrderPlaces($orderedList);
+
+			//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
+			$output .= $listHandler->ShowList($listId, $listView, true, true, $user);
+
+			return $output;
+		}
 }

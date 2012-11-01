@@ -4,7 +4,7 @@ namespace View;
 
 class MainView {
 
-	public function ShowMainView () {
+	public function ShowMainNotLoggedIn () {
 		return "<div id='mainViewContainer'>
 					<h2>Welcome to Collaborage!</h2>
 					<p>Collaborage is a service that brings democracy to a new level when it comes to making decisions.</p>
@@ -22,5 +22,13 @@ class MainView {
 					<p>When all of you are done with the prioritazion you'll the the average order, and the top three ones are going to be the ones you'll visit.
 				</div>";
 	}
-	
+
+	public function ShowMainLoggedIn ($username) {
+		return "<div id='mainViewContainer'>
+					<h2>Welcome back, $username!</h2>
+
+					<h3 class='mainView'>Text here...</h3>
+					<p>And here...</p>
+				</div>";
+	}
 }

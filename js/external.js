@@ -210,8 +210,22 @@ var Capsule = {
 
 		$('.tooltip').tipsy({trigger: 'focus', gravity: 'w'});
 
+        if($('.fail').length) {
+            $('.fail').effect("bounce", { times:8 }, 2200, function() {
+                $(this).hide();
+            });
+        }
 
+        if($('.success').length) {
+            $('.success').effect("bounce", { times:8 }, 2200, function() {
+                $(this).hide();
+            });
+        }
 		
+
+        ('slow', function() {
+    // Animation complete.
+  });
 
 		$('#listElements').sortable({
 			opacity: 0.5,
@@ -228,6 +242,8 @@ var Capsule = {
 		            order += $(this).attr('id');//.push($(this).attr('id'));
 		            i +=1;
 		        });
+
+                $('#newOrder').show();
 
 		        var url = $('#newOrder').attr("url");
 

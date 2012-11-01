@@ -22,7 +22,7 @@ class LoginView {
 
     // Variablar för meddelanden.
     const LOGGED_IN = "<p class='success'>You are logged in!</p>";
-    const LOGGED_OUT = "<p class='succses'>You are logged out!</p>";
+    const LOGGED_OUT = "<p class='success'>You are logged out!</p>";
     const WRONG_USERNAME_OR_PASSWORD = "<p class='fail'>Wrong username and/or password!</p>";
 
     /**

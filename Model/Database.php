@@ -128,7 +128,6 @@ class Database {
         if ($stmt->execute() == FALSE) {
                 throw new \Exception($this->mysqli->error);
         }
-        $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
         if ($stmt->bind_result($field1, $field2, $field3, $field4) == FALSE) {
@@ -210,10 +209,9 @@ class Database {
         if ($stmt->execute() == FALSE) {
                 throw new \Exception($this->mysqli->error);
         }
-        $ret = 0;
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($listId, $userId, $listName, $creationDate) == FALSE) {
+        if ($stmt->bind_result($listId, $userId, $listName, $creationDate, $listIsDone) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
@@ -222,7 +220,8 @@ class Database {
             $lists[] = array('listId' => $listId,
                            'userId' => $userId,
                            'listName' => $listName,
-                           'creationDate' => $creationDate);
+                           'creationDate' => $creationDate,
+                           'listIsDone' => $listIsDone);
         }
         
         $stmt->Close();
@@ -264,7 +263,7 @@ class Database {
 
         while ($stmt->fetch()) {
             if ($result == 0) {
-                $allHasSorted = 0;
+                $allHasSorted = false;
             }
         }
 
@@ -273,7 +272,7 @@ class Database {
 
     public function CheckListStatus($stmt) {
 
-        $listIsDone = true;
+        $isSorted = true;
 
         if ($stmt === FALSE) {
             throw new \Exception($this->mysqli->error);
@@ -285,20 +284,26 @@ class Database {
         }
             
         //Bind the $ret parameter so when we call fetch it gets its value
-        if ($stmt->bind_result($isFinished) == FALSE) {
+        if ($stmt->bind_result($listIsDone) == FALSE) {
             throw new \Exception($this->mysqli->error);
         }
         
         // Hämtar ids och användarnamn och lägger i arrayen.
-        while ($stmt->fetch()) {
-            if ($isFinished == false) {
-            $listIsDone = false;
+        if ($stmt->fetch()) {
+            if ($listIsDone = null) {
+                echo "sdfsdfsdf";
+                $isSorted = true;
             }
+            else {
+                $isSorted = false;
+            }
+        } else {
+            return null;
         }
         
         $stmt->Close();
 
-        return $listIsDone;
+        return $isSorted;
     }
 
     public function GetListUsersIds($stmt) {
@@ -455,8 +460,6 @@ class Database {
                                  'listElemDesc' => $listElemDesc,
                                  'listElemOrderPlace' => $listElemOrderPlace);
         }
-
-        var_dump($listElements);
         
         $stmt->Close();
 

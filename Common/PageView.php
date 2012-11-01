@@ -14,6 +14,7 @@ class PageView {
   const NOT_LOGGED_IN = 'Please log in';
   const VIEW_LIST = 'List view';
   const SHOW_LIST = 'Show list';
+  const SHOW_ORDERED_LIST = 'The list is ordered!';
   const LIST_SAVED = 'List was saved!';
   
   // Config for page

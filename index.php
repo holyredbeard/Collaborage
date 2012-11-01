@@ -64,14 +64,14 @@ session_start();
 
             $pageView = new \Common\PageView();
 
-            $IsLoggedIn = $loginHandler->IsLoggedIn();
-
             if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
                 $body .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler);
             }
             else {
                 $body .= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler, $pageView);
             }
+
+            $IsLoggedIn = $loginHandler->IsLoggedIn();
 
             $actionType = $URLQueryView->GetType();
 
@@ -87,10 +87,13 @@ session_start();
                 $body .= $userController->DoControl($userHandler, $userView, $pageView);
             }
             else {
-                $body .= $mainView->ShowMainView();
+                if ($IsLoggedIn) {
+                    $body .= $mainView->ShowMainLoggedIn($user['username']);
+                }
+                else {
+                    $body .= $mainView->ShowMainNotLoggedIn();
+                }
             }
-
-            // TODO: Ändra namn på filerna till AdminView etc...
 
             //Close the database since it is no longer used
             $db->Close();

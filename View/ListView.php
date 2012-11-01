@@ -6,6 +6,9 @@ session_start();
 
 class ListView {
 
+	const LIST_IS_SORTED = 'Everyone is done. The list is sorted!';
+	const USER_DONE_SORTING = 'You\'re done sorting, waiting for the others.';
+
 	private $m_newListName = 'listName';
 	private $m_newListCreationDate = 'newListCreationDate';
 	private $m_newListExpireDate = 'newListExpireDate';
@@ -18,15 +21,19 @@ class ListView {
 	private $m_newListObjectDesc = 'newListObjectDesc';
 	private $m_listObjectName = 'listObjectName';
 
+	private $m_sortable = 'listElements';
 	private $m_listObject = 'notSorted';
 	private $m_listStatus = 'You haven\'t sorted the list yet!';
+	private $m_listIsSorted = 'listIsSorted';
+	private $m_userDoneSorting = 'userDoneSorting';
+	private $m_listElementSorted ='listElements3';
 
 	private $m_newListSubmit = 'newListIsSubmit';
 	private $m_newOrderListSubmit = 'newOrderListSubmit';
 
 	public function ShowAllLists($assignedLists, $usersLists, $IsLoggedIn) {
 
-		$listHTML = "<div id='listContainer'>";
+		$listHTML = "<div id='listContainer2'>";
 		$listHTML .= "<h2>Lists</h2>";
 
 		if ($IsLoggedIn) {
@@ -42,7 +49,7 @@ class ListView {
 
 				return $listHTML;
 			}
-			
+
 			$listHTML .= "<h3 class='usersLists'>Your lists</h3>";
 
 			if ($usersLists != null) {
@@ -102,7 +109,7 @@ class ListView {
 
 		$userStatus = CheckStatus($userIsFinished);
 
-		$showUsers .= "<ul><li class='userList'><strong><span class='userName'>$theUserName (you)</span></strong><span class='userStatus'>$userStatus</span></li>";
+		$showUsers .= "<ul><li class='userList'><strong><span class='userName'>You</span></strong><span class='userStatus'>$userStatus</span></li>";
 
 		foreach ($list['listUsers'] as $user) {
 				$userId = $user['userId'];
@@ -119,15 +126,15 @@ class ListView {
 				}
 			}
 
-		$showUsers .= "</ul>";
-
-		if (($userIsFinished) && ($allHasSorted == false)) {
-			$this->m_listObject = 'doneSorted';
-			$this->m_listStatus = 'You\'re done sorting, waiting for the others.';
+		if ($allHasSorted) {
+			$this->m_listObject = $this->m_listIsSorted;
+			$this->m_sortable = $this->m_listElementSorted;
+			$this->m_listStatus = self::LIST_IS_SORTED;
 		}
-		else if ($allHasSorted) {
-			$this->m_listObject = 'doneSorted';
-			$this->m_listStatus = 'Everyone is done. The list is sorted!';
+		else if ($userIsFinished) {
+			$this->m_listObject = $this->m_userDoneSorting;
+			$this->m_sortable = $this->m_listElementSorted;
+			$this->m_listStatus = self::USER_DONE_SORTING;
 		}
 		else {
 			shuffle($list['listElements']);
@@ -140,10 +147,8 @@ class ListView {
 			$listElemDesc = $element['listElemDesc'];
 
 			$showElements .= "<ul>";
-
 			$showElements .= "<li id='$listElemId' class='$this->m_listObject'><strong>$listElemName</strong><br>
 									$listElemDesc</li>";
-			
 			$showElements .= "</ul>";
 		}
 
@@ -155,13 +160,11 @@ class ListView {
 			// Create list
 		$listHTML = "<div id='listContainer'>
 							<h2>$listName</h2>
-							<div id='listElements'>
+							<div id='$this->m_sortable'>
 								$showElements
 							</div>
-							<div id='listElements2'></div>
 							<div id='listUsers'>
-								<p><hr></p>
-								<h3>Collaborators</h3>
+								<h3 class='collaborators'>Collaborators</h3>
 								$showUsers
 							</div>
 							<div id='listInfo'>

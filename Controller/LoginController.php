@@ -34,7 +34,6 @@ class LoginController {
             // Har användaren inte försökt logga ut visas logout-knappen
     		else {
     			$loginView->DoLogoutBox();
-                echo 'gs';
     		}
     	}
 

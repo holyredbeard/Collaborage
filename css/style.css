@@ -12,7 +12,7 @@ body.index{
     top: 0;
     left: 0;
     z-index: -5000;
-	background: #E0E0E0;
+	background: url('../img/bg.jpg');
 }
 
 body.index2 {
@@ -27,7 +27,7 @@ body.index2 {
 
 
 #mainContainer {
-	margin-top: 60px;
+	margin-top: 90px;
 	margin-bottom: 60px;
 
 }
@@ -40,7 +40,7 @@ body.index2 {
 	width: 600px;
 	min-height: 350px;
 	margin: 0px auto;
-	border: 6px solid rgba(0, 0, 0, 0.2);
+	border: 6px solid rgba(0, 0, 0, 0.1);
     -webkit-background-clip: padding-box; /* for Safari */
     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
@@ -123,12 +123,11 @@ ul.menu li.menu a:hover{
   text-decoration: underline;
 }​
 
-ul.notSorted, li.notSorted, li.doneSorted {
+ul.notSorted, li.notSorted, li.userDoneSorting, li.listIsSorted	 {
   color: white;
   margin-top: 5px;
   padding: 10px 10px 10px 15px;
   border-radius: 3px;
-  background: #934152;
   width: 410px;
   height: 25px;
   display: block;
@@ -139,6 +138,18 @@ ul.notSorted, li.notSorted, li.doneSorted {
   border: 3px solid rgba(0, 0, 0, 0.2);
   -webkit-background-clip: padding-box; /* for Safari */
   background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+li.notSorted {
+	background: #934152;
+}
+
+li.userDoneSorting {
+	background: #bf7026;
+}
+
+li.listIsSorted {
+	background: #486d33;
 }
 
 li.notSorted:hover {
@@ -155,13 +166,13 @@ li.notSorted {
 	margin-left: -35px;
 }
 
-li.doneSorted {
+li.userDoneSorting, li.listIsSorted {
 	height: 30px;
 	margin-left: -35px;
 }
 
-ul.doneSorted {
-	
+ul.listIsSorted {
+
 }
 
 /* GENERAL */
@@ -260,7 +271,7 @@ h3.listInfo {
 	margin-top: 100px;
 }
 
-h2, h3.listInfo, h3.assigned, h3.usersLists, h3.mainView {
+h2, h3 {
 	color: #934152;
 }
 
@@ -291,6 +302,32 @@ h2, h3.listInfo, h3.assigned, h3.usersLists, h3.mainView {
  width: 55%;
 }
 
+#newOrder {
+	position: relative;
+	top: 20px;
+	margin-top: 200px;
+	background: #999;
+    padding: 5px 10px;
+    color: #fff;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 2px;
+    border: 1px solid #777;
+    text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+    -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -moz-box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2);
+    -webkit-transition-duration: 0.2s;
+    -moz-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    -webkit-user-select:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
+    user-select:none;
+
+	text-decoration: none;
+}
+
 #newListContainer {
 	color: #555;
 	background: #fff;
@@ -298,23 +335,31 @@ h2, h3.listInfo, h3.assigned, h3.usersLists, h3.mainView {
 	padding: 0px 10px 10px 10px;
 	width: 450px;
 	margin: 0px auto;
-	border: 6px solid rgba(0, 0, 0, 0.2);
+	border: 6px solid rgba(0, 0, 0, 0.1);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+}
+
+#listContainer, #listContainer2 {
+	color: #2E4F45;
+	background: #fff;
+	position: relative;
+	top: -20px;
+	border-radius: 3px;
+	padding: 10px 20px 20px 20px;
+	width: 450px;
+	margin: 0px auto;
+	border: 6px solid rgba(0, 0, 0, 0.1);
     -webkit-background-clip: padding-box; /* for Safari */
     background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 #listContainer {
-	color: #2E4F45;
-	background: #fff;
-	position: relative;
-	top: 20px;
-	border-radius: 3px;
-	padding: 10px 20px 20px 20px;
-	width: 450px;
-	margin: 0px auto;
-	border: 6px solid rgba(0, 0, 0, 0.2);
-    -webkit-background-clip: padding-box; /* for Safari */
-    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
+	min-height: 495px;
+}
+
+#listUsers {
+	margin-top: 20px;
 }
 
 #cancelList {
@@ -533,13 +578,29 @@ h2, h3.listInfo, h3.assigned, h3.usersLists, h3.mainView {
 /* MESSAGES */
 
 .success {
-	background: green;
-	padding: 2px;
+	background: white;
+	border-radius: 2px;
+	position: absolute;
+	top: 80px;
+	right: 50px;
+	color: green;
+	padding: 8px;
+	border: 4px solid rgba(0, 0, 0, 0.1);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 .fail {
-	background: red;
-	padding: 2px;
+	background: white;
+	border-radius: 2px;
+	position: absolute;
+	top: 80px;
+	right: 50px;
+	color: red;
+	padding: 8px;
+	border: 4px solid rgba(0, 0, 0, 0.1);
+    -webkit-background-clip: padding-box; /* for Safari */
+    background-clip: padding-box; /* for IE9+, Firefox 4+, Opera, Chrome */
 }
 
 .failMessage {
