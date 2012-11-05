@@ -28,8 +28,6 @@ session_start();
 
     // Common
     require_once ('Common/PageView.php');
-    require_once ('Common/PageHeader.php');
-    require_once ('Common/PageFooter.php');
 
     $title = "Login form";
     $body = "";
