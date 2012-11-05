@@ -8,36 +8,55 @@ require_once('Common/PageView.php');
 
 class ListController {
 	
-	public function DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn, $pageView, $validation) {
+	public function DoControl(\Model\loginHandler $loginHandler,
+							  \Model\Database $db,
+							  \View\URLQueryView $URLQueryView,
+							  $IsLoggedIn,
+							  \Common\PageView $pageView,
+							  $validation) {
+		
 		$listView = new \View\ListView();
 		$listHandler = new \Model\ListHandler($db);
 		$userHandler = new \Model\UserHandler($db);
 		$loginHandler = new \Model\loginHandler($db);
 		$validation = new \Model\ValidationHandler();
 
+		// Hämtar array med användaren (id och användarnamn)
 		$user = $loginHandler->GetStoredUser();
+
+		// Hämtar information från URL:en om vad användaren valt att göra
 		$action = $URLQueryView->GetAction();
 
+		// Switch-sats som beroende på vad användaren valt att göra (vilket hämtas från URL:en) styr vad som ska göras/visas
 		switch ($action) {
+
+			// Om användaren valt att skapa en ny lista
 			case 'newList':
+
+				// Om användaren är inloggad körs nedan...
 				if ($IsLoggedIn) {
+					// Om användaren klickat på submit-knappen (och därmed valt att skapa lista) körs nedan...
 					if ($listView->WantToCreateList()) {
+
+						// Hämta datan från listan
 						$listName = $listView->GetListName();
 						$listObjects = $listView->GetListObjects();
 						$listObjectDescs = $listView->GetListObjectDescs();
 						$userCheckBoxes = $listView->GetListUsers();
-						$checkValidation = $validation->DoValidateList($listName, $listObjects, /*$listObjectDescs, */$userCheckBoxes);
 
+						// Validerar datan...
+						$checkValidation = $validation->DoValidateList($listName, $listObjects, $userCheckBoxes);
+
+						// Om datan var okej körs nedan...
 						if ($checkValidation) {
-							$list = $listHandler->GenerateListArray($user, $listName, $listObjects, $listObjectDescs, $userCheckBoxes);
 
-							if ($list != null) {
-								$list = $listHandler->SaveNewList($list);
-								
-								//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
-								$output = $listHandler->ShowList($list['listId'], $listView, false, false, $user, null);
-							}
+							// Sparar listan, vilket returnerar listIdt
+							$listId = $listHandler->SaveNewList($user['userId'], $listName, $listObjects, $listObjectDescs, $userCheckBoxes);
+
+							// Visar listan
+							$output = $listHandler->ShowList($listId, $listView, false, false, $user, null);
 						}
+						//...vad inte valideringen okej hämtas valideringsfelen som visas för användaren
 						else {
 							$errors = $validation->GetValidationError();
 
@@ -45,71 +64,95 @@ class ListController {
 							$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler, $errors);
 						}
 					}
+					//...annars körs nedan som visar formuläret för att skapa en ny lista
 					else {
+						// Hämtar och sätter sidans titel
 						$pageView->setTitle(\Common\PageView::TITLE_CREATE_NEW_LIST);
 
 						$users = $userHandler->GetAllUsers();
 						$output .= $listView->CreateListForm($users, $user['userId'], $loginHandler, null);
 					}
 				}
+				//...annars visas information för användaren att man måste logga in
 				else {
+					// Hämtar och sätter sidans titel
 					$pageView->setTitle(\Common\PageView::NOT_LOGGED_IN);
 
 					$output .= $listView->ShowNotLoggedIn();
 				}
-
 				break;
 
+			// Om användaren valt att visa lista med listor
 			case 'showLists':
 
+				// Om användaren är inloggad körs nedan...
 				if ($IsLoggedIn) {
+					// Array med listor som användaren är knuten till hämtas
 					$assignedLists = $listHandler->GetAssignedLists($user['userId']);
+
+					// Array med listor som användaren skapat hämtas
 					$usersLists = $listHandler->GetUsersLists($user['userId']);
 
+					// Array med listor som är sorterade hämtas
+					$sortedLists = $listHandler->GetSortedLists();
+
+					// Hämtar och sätter sidans titel
 					$pageView->setTitle(\Common\PageView::VIEW_LIST);
 
-					$output .= $listView->ShowAllLists($assignedLists, $usersLists, $IsLoggedIn);
+					// Visar lista med de listor som är tillgängliga för användaren
+					$output .= $listView->ShowAllLists($assignedLists, $usersLists, $IsLoggedIn, $sortedLists);
 				}
+				//...annars visas information för användaren att man måste logga in
+				else {
+					// Hämtar och sätter sidans titel
+					$pageView->setTitle(\Common\PageView::NOT_LOGGED_IN);
 
+					$output .= $listView->ShowNotLoggedIn();
+				}
 				break;
 
+			// Om användaren valt att visa en lista			
 			case 'showList':
 
+				// Hämtar listId till den lista som ska visas från URL:en
 				$listId = $URLQueryView->GetListId();
 
-				// TODO: Här måste det kollas VARJE enskild användare om de är klara, inte bara denna.
-				// Vidare om någon inte är klar visas den lista man senast skapade, låst.
-				// Om möjlighet ska finnas ska det här gå att låsa upp om man vill ändra
-
+				// Kontrollerar om användaren har sorterat klart listan eller ej
 				$userIsFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
 
-				if ($userIsFinished) {
-					$allHasSorted = $listHandler->AllHasSorted($listId);
-				}
+				// Kontrollerar om listan är färdigsorterad
+				$listIsSorted = $listHandler->CheckListStatus($listId);
 
-				// If not finished, let's sort the list!
-				if ($allHasSorted == true) {
+				// Visar listan för användaren
+				if ($listIsSorted == true) {
+					// Hämtar och sätter sidans titel
 					$pageView->setTitle(\Common\PageView::SHOW_ORDERED_LIST);
-					$output .= $this->ShowOrderedList($listHandler, $listView, $listId);
+					$output .= $listHandler->ShowOrderedList($listHandler, $listView, $listId, $user['userId']);
 				}
 				else {
+					// Hämtar och sätter sidans titel
 					$pageView->setTitle(\Common\PageView::SHOW_LIST);
 					$output .= $listHandler->ShowList($listId, $listView, $userIsFinished, false, $user);
 				}
-
 				break;
 
+			// Om användaren valt att spara en nysorterad lista
 			case 'saveNewListOrder':
+
+				// Hämta listordningen från URL:en
 				$listOrder = $URLQueryView->GetListOrder();
+
+				// Hämtar listid för den lista som sorterats
 				$listId = $URLQueryView->GetListId();
 
+				// Kontrollerar om användaren har sorterat klart listan eller ej
 				$userIsFinished = $listHandler->HasFinishedSorting($user['userId'], $listId);
 
+				// Om användaren inte har sorterat tidigare sparas den nya sorteringen
 				if ($userIsFinished == false) {
-					$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
-					
+					// Hämtar och sätter sidans titel
 					$pageView->setTitle(\Common\PageView::LIST_SAVED);
-
+					$listOrderSaved = $listHandler->SaveListOrder($user['userId'], $listOrder, $listId);
 				}
 
 				// check if the list sorting is done
@@ -118,30 +161,14 @@ class ListController {
 				// If not finished, let's sort the list!
 				if ($allHasSorted == true) {
 					$pageView->setTitle(\Common\PageView::SHOW_ORDERED_LIST);				
-					$output .= $this->ShowOrderedList($listHandler, $listView, $listId);
+					$output .= $listHandler->ShowOrderedList($listHandler, $listView, $listId, $user['userId']);
 				}
-
-				//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
-				$output .= $listHandler->ShowList($listId, $listView, true, false, $user);
-
+				else {
+					//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
+					$output .= $listHandler->ShowList($listId, $listView, true, false, $user);
+				}
 				break;
 		}
-
 		return $output;
 	}
-
-	public function ShowOrderedList($listHandler, $listView, $listId) {				
-			$listUsers = $listHandler->GetListUsersIds($listId);
-			$listOrders = $listHandler->GetListOrders($listId, $listUsers);
-
-			$orderedList = $listHandler->CalculateOrder($listOrders);
-
-			// TODO: Fixa så att de blir lika om samma poäng!
-			$wasAdded = $listHandler->AddListElemOrderPlaces($orderedList);
-
-			//$listId, $listView, $userIsFinished, $allHasSorted, $theUser
-			$output .= $listHandler->ShowList($listId, $listView, true, true, $user);
-
-			return $output;
-		}
 }

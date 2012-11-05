@@ -27,7 +27,8 @@ class LoginView {
 
     /**
      * Generera och returnera inloggnings-formulär
-     * 
+     *
+     * @param Strin, $regButton
      * @return String,  HTML
      */
 	public function DoLoginBox($regButton) {

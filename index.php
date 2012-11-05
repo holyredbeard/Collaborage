@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-    //require_once ('Include')
-
     // Models
     require_once ('Model/DBConfig.php');
     require_once ('Model/Database.php');
@@ -11,6 +9,7 @@ session_start();
     require_once ('Model/EncryptionHandler.php');
     require_once ('Model/UserHandler.php');
     require_once ('Model/ValidationHandler.php');
+    require_once ('Model/StoreListHandler.php');
 
   	//Views
   	require_once ('View/RegisterView.php');
@@ -64,32 +63,46 @@ session_start();
 
             $pageView = new \Common\PageView();
 
+            // Om användaren valt att registrera sig eller försökt att registrera sig (klickat på submit i reg-formuläret)
+            // körs registreringskontrollern...
             if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
-                $body .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler);
+                $regBox .= $registerController->DoControl($registerHandler, $registerView, $encryptionHandler, $loginHandler, $userHandler, $pageView);
             }
+            //...annars körs loginkontrollern.
             else {
                 $body .= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler, $pageView);
             }
 
+            // Kör IsLoggedIn() som returnerar om användaren är inloggad eller inte
             $IsLoggedIn = $loginHandler->IsLoggedIn();
 
+            // Hämtar vad användaren valt att göra från URL:en (antingen 'list' eler 'admin')
             $actionType = $URLQueryView->GetType();
 
+            // Hämtar array med användaruppgifter (id och användarnamn)
             $user = $loginHandler->GetStoredUser();
 
+            // Kollar om användaren har adminbehörighet
             $isAdmin = $loginHandler->CheckIfAdmin($user['userId']);
 
+            // Om actiontype är 'list' körs nedan...
             if ($actionType == 'list'){
                 $body .= $listController->DoControl($loginHandler, $db, $URLQueryView, $IsLoggedIn, $pageView, $validation);
             }
-
+            //... är actiontype 'admin' körs nedan...
             else if (($actionType == 'admin') && ($IsLoggedIn) && ($isAdmin)) {
                 $body .= $userController->DoControl($userHandler, $userView, $pageView);
             }
+            //... annars körs nedan
             else {
+                // Är användaren inloggad visas förstasidan i inloggad vy
                 if ($IsLoggedIn) {
                     $body .= $mainView->ShowMainLoggedIn($user['username']);
                 }
+                else if ($registerView->WantToRegister() || $registerView->TredToRegister()) {
+                    $body = $mainView->ShowRegisterView($regBox);
+                }
+                // annars visas utloggad vy
                 else {
                     $body .= $mainView->ShowMainNotLoggedIn();
                 }

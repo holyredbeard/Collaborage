@@ -16,6 +16,7 @@ class PageView {
   const SHOW_LIST = 'Show list';
   const SHOW_ORDERED_LIST = 'The list is ordered!';
   const LIST_SAVED = 'List was saved!';
+  const USER_LIST = 'List of users';
   
   // Config for page
   private $m_cssFiles = array('style.css', 'jquery-ui-1.9.0.custom.css', 'jquery-ui-1.9.0.custom.min.css', 'tipsy.css');

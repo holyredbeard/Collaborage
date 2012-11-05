@@ -2,8 +2,14 @@
 
 namespace View;
 
+// Klass som hämtar information från URL:en
 class URLQueryView {
 
+    /**
+     * Hämtar och returnerar "type" från URL:en
+     *
+     * @return String
+     */
 	public function GetType() {
 
 		if (isset($_GET['type'])) {
@@ -13,6 +19,11 @@ class URLQueryView {
 		return $type;
 	}
 
+	/**
+     * Hämtar och returnerar "action" från URL:en
+     *
+     * @return String
+     */
 	public function GetAction() {
 
 		if (isset($_GET['action'])) {
@@ -22,14 +33,24 @@ class URLQueryView {
 		return $action;
 	}
 
+	/**
+     * Hämtar och returnerar "listId" från URL:en
+     *
+     * @return String
+     */
 	public function GetListId() {
 		if (isset($_GET['listId'])) {
 			$listId = $_GET['listId'];
 		}
 
-		return $listId;	
+		return $listId;
 	}
 
+	/**
+     * Hämtar och returnerar "userId" från URL:en
+     *
+     * @return String
+     */
 	public function GetUserId() {
 		if (isset($_GET['userId'])) {
 			$userId = $_GET['userId'];
@@ -38,11 +59,16 @@ class URLQueryView {
 		return $userId;	
 	}
 
+	/**
+     * Hämtar och returnerar "listOrder" från URL:en
+     *
+     * @return String
+     */
 	public function GetListOrder() {
 		if (isset($_GET['listOrder'])) {
-			$userId = $_GET['listOrder'];
+			$listOrder = $_GET['listOrder'];
 		}
 
-		return $userId;	
+		return $listOrder;	
 	}
 }

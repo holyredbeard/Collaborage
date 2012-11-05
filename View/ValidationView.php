@@ -4,14 +4,15 @@ namespace View;
 
 class ValidationView {
 	
-	private $m_errors = array();
+	// Array som lagrar felmeddelanden.
+	// private $m_errors = array();
 
-	// List creation
+	// Felmeddelanden för listor
 	const NEED_LIST_NAME = "<span class='errorMessage'>You need to give the list a name.</span>";
 	const NEED_MORE_LISTOBJECTS = "<span class='errorMessage'>You need to add at least three list objects.</span>";
 	const NEED_MORE_USERS = "<span class='errorMessage'>You need to assign at least two users.</span>";
 
-	// Registering
+	// Felmeddelanden för registering
     const PASSWORD_DID_NOT_MATCH = "The passwords didn't match!";
     const USERNAME_WRONG_FORMAT = "Username contains illegal characters.";
     const USERNAME_TOO_SHORT = "Username is too short (minimum 5 characters).";

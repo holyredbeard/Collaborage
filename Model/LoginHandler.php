@@ -100,6 +100,7 @@ class LoginHandler {
 
 	/**
 	 * Kedje-tester för applikationen
+	 * 
 	 * @param Database $db
 	 * @return boolean
 	 */

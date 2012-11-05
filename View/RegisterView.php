@@ -11,14 +11,13 @@ class RegisterView {
     private $_registerButton = 'registerButton';
     private $_registerCancel = 'registerCancel';
     private $_register = 'register';
-
     private $cssClassFailMessage = 'failMessage';
     private $cssClassFail = 'fail';
     private $cssClassSuccess = 'success';
 
-    // Constants
+    /*// Konstanter
     private $minUsernameLength = 5;
-    private $minPasswordLength = 6;
+    private $minPasswordLength = 6;*/
 
     // Meddelanden
     const SUCCESSFULLY_REGISTERED = "<p class='success'>Registration successful!.</p><p>Log in with the username and password you registered with.</p>";
@@ -34,26 +33,26 @@ class RegisterView {
     const USERNAME_EXISTS = "Username already exists.";
 
     /**
-     * Generera och returnera registrerings-formulär
+     * Genererar och returnerar registrerings-formuläret
      *
      * @return String, HTML
      */
 	public function DoRegisterBox() {
-		return "<div id='form'>
+		return "<div id='registerForm'>
 				<form id='form2' method='post' action=''>
 					<fieldset>
-						<label for='$this->_registerUserName'>Username:<br /><input type='text' id='$this->_registerUserName' name='$this->_registerUserName' size='20' /></label><br/>
-						<label for='$this->_registerPassword' >Password:<br /><input type='password' id='$this->_registerPassword' name='$this->_registerPassword' size='20' /></label><br/>
-						<label for='$this->_registerPassword2' >Repeat password:<br /><input type='password' id='$this->_registerPassword2' name='$this->_registerPassword2' size='20' /></label><br/>
+						<label for='$this->_registerUserName'>Username:<br /><input type='text' class='tooltip' title='Choose a username with a minimum of 5 characters' id='$this->_registerUserName' name='$this->_registerUserName' size='20' /></label><br/>
+						<label for='$this->_registerPassword' >Password:<br /><input type='password' class='tooltip' title='Choose a password with a minimum of 6 characters' id='$this->_registerPassword' name='$this->_registerPassword' size='20' /></label><br/>
+						<label for='$this->_registerPassword2' >Repeat password:<br /><input type='password' class='tooltip' title='Repeat the password' id='$this->_registerPassword2' name='$this->_registerPassword2' size='20' /></label><br/>
 						<input type='submit' id='$this->_registerButton' name='$this->_registerButton' value='Register' />
-						<input type='submit' name='$this->_registerCancel' value='Cancel' /></label>
+						<input type='submit' class='cancelButton' name='$this->_registerCancel' value='Cancel' /></label>
 					</fieldset>
 				</form>
 			</div>";
 	}
 
 	/**
-     * Generera och returnera registrerings-knapp
+     * Genererar och returnerar registrerings-knappen
      *
      * @return String, HTML
      */
@@ -67,7 +66,7 @@ class RegisterView {
 	}
 
 	/**
-    * Kontrollera om användaren klickat på registrerings-knappen
+    * Kontrollerar om användaren klickat på registrerings-knappen
     * 
     * @return boolean
     */
@@ -81,7 +80,7 @@ class RegisterView {
     }
 
 	/**
-    * Returnera användarnamn från formulär
+    * Returnerar användarnamnet från formuläret
     * 
     * @return boolean
     */
@@ -96,7 +95,7 @@ class RegisterView {
 	}
 
 	/**
-    * Returnera lösenord från forumlär
+    * Returnerar lösenordet från forumläret
     * 
     * @return boolean
     */
@@ -110,7 +109,7 @@ class RegisterView {
     }
 
 	/**
-    * Returnera upprepat lösenord från formulär
+    * Returnerar upprepat lösenordet från formuläret
     * 
     * @return boolean
     */
@@ -125,7 +124,7 @@ class RegisterView {
    	}
 
     /**
-    * Kontrollera om användaren valt att skicka in registrerings-formuläret
+    * Kontrollerar om användaren valt att skicka in registrerings-formuläret
     * 
     * @return boolean
     */
@@ -140,7 +139,8 @@ class RegisterView {
 
     /**
     * Sätter samman html-kod med felmeddelanden i registreringsformuläret.
-    * 
+    *
+    * @param String: $errorMessages, String: $validationErrors
     * @return String
     */
     public function GetErrorMessages($errorMessages, $validationErrors){

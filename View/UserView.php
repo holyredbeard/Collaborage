@@ -25,7 +25,6 @@ class UserView {
      */
 	public function ShowUsers(Array $userArray) {
 
-		// TODO: Fixa med denna array så att det blir en associativ
 		$userIdArray = $userArray[0];
 		$userNameArray = $userArray[1];
 		$usersToInclude = implode(",", $userNameArray);
@@ -55,10 +54,11 @@ class UserView {
 		return $userList;
 	}
 
-
 	/**
-	 * Kontrollerar om användaren klickat på submit-knappen
-	 */
+    * Kontrollera om användaren klickat på submit-knappen
+    * 
+    * @return boolean
+    */
 	public function TriedToRemoveUser() {
 		if (isset($_POST[$this->_submitRemove])) {
 			return true;        
@@ -70,8 +70,10 @@ class UserView {
 	}
 
 	/**
-	 * Hämtar och returnerar de användare användaren klickat i som ska tas bort
-	 */
+    * Hämta och returnerar de användare användaren klickat i som ska tas bort
+    * 
+    * @return boolean
+    */
 	public function GetUsersToRemove() {
 		if (isset($_POST[$this->_check])) {
             return $_POST[$this->_check];

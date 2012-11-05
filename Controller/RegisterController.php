@@ -10,7 +10,8 @@ class RegisterController {
                               \View\RegisterView $registerView,
                               \Model\EncryptionHandler $encryptionHandler,
                               \Model\LoginHandler $loginHandler,
-                              \Model\UserHandler $userHandler) {
+                              \Model\UserHandler $userHandler,
+                              \Common\PageView $pageView) {
 
         $validation = new \Model\ValidationHandler();
         $loginView = new \View\loginView();
@@ -52,7 +53,7 @@ class RegisterController {
                 }
 
                 // Validerar användarnamn och lösenord
-                $validation = new \Model\Validation();
+                $validation = new \Model\ValidationHandler();
                 $validate = $validation->DoValidateRegistering($regUsername, $regPassword, $regPassword2);
 
                 // Gick valideringen inte igenom avbryts registreringen
@@ -70,7 +71,7 @@ class RegisterController {
                 // Visar meddelande för användare beroende på hur registrering gick
                 if ($regTry){
                     $xhtml = \View\RegisterView::SUCCESSFULLY_REGISTERED;
-                    $xhtml.= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler);
+                    $xhtml.= $loginController->DoControl($loginHandler, $loginView, $registerView, $encryptionHandler, $pageView);
                 }
                 else {
                     $xhtml = \View\RegisterView::UNSUCCESSFULLY_REGISTERED;

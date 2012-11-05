@@ -1,12 +1,13 @@
 <?php
 session_start();
-
 	
 	require_once "Model/LoginHandler.php";
+	require_once "Model/ListHandler.php";
+	require_once "View/ListView.php";
 	require_once "Model/UserHandler.php";
 	require_once "Model/RegisterHandler.php";
 	require_once "Model/EncryptionHandler.php";
-	require_once "Model/Validation.php";
+	require_once "Model/ValidationHandler.php";
 	require_once "Model/Database.php";
 	require_once "Model/DBConfig.php";
 	require_once "View/LoginView.php";
@@ -49,7 +50,7 @@ session_start();
 
 			/* --------------- Test av Validation() ------------------- */
 
-			if (\Model\Validation::Test() == FALSE) {
+			if (\Model\ValidationHandler::Test() == FALSE) {
 				$xhtml .= "<br/>Testet av Validation() misslyckades.<hr/>";
 			}
 			else {
@@ -80,6 +81,15 @@ session_start();
 			/* --------------- Test av EncryptionHandler() ------------------- */
 
 			if (\Model\EncryptionHandler::Test($db) == FALSE) {
+				$xhtml .= "<br/>Testet av EncryptionHandler() misslyckades.<hr/>";
+			}
+			else {
+				$xhtml .= "<br/>Testet av EncryptionHandler() lyckades.<hr/>";
+			}
+
+			/* --------------- Test av ListHandler() ------------------- */
+
+			if (\Model\ListHandler::Test($db) == FALSE) {
 				$xhtml .= "<br/>Testet av EncryptionHandler() misslyckades.<hr/>";
 			}
 			else {

@@ -3,8 +3,6 @@
 namespace Model;
 
 require_once ('View/ValidationView.php');
-//require_once ('Model/registerHandler.php');
-
 
 class ValidationHandler {
 
@@ -21,6 +19,7 @@ class ValidationHandler {
     /**
      * Funktion som tar emot användarnamn och lösenord och kontrollerar
      * dem mot samtliga valideraingsfunktioner.
+     * 
      * @param String $regUsername
      * @param String $regPassword
      * @param String $regPassword2
@@ -39,7 +38,7 @@ class ValidationHandler {
         }
     }
 
-    public function DoValidateList($listName, $listObjects, /*$listObjectDescs, */$userCheckBoxes) {
+    public function DoValidateList($listName, $listObjects, $userCheckBoxes) {
         $listNameCheck = $this->ValidateListName($listName);
         $listObjectsCheck = $this->ValidateListObjects($listObjects);
         $userCheckBoxesCheck = $this->ValidateListUsers($userCheckBoxes);
@@ -152,7 +151,7 @@ class ValidationHandler {
      */
     public static function Test() {
 
-        $validation = new Validation();
+        $validation = new ValidationHandler();
 
         /**
          * Test 1: Testa så att man inte kan registrera med ett användarnamn med otillåtna tecken (t ex åäö).

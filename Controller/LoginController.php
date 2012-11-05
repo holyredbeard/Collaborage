@@ -7,8 +7,7 @@ class LoginController {
     /**
      * Genererar XHTML (forumlär, felmeddelanden etc...)
      * 
-     * @param $loginHandler, instance of LoginHandler()
-     * @param $loginView, instance of LoginView()
+     * @param \Model\LoginHandler() $loginHandler, \View\LoginView() $loginView
      * @return String, XHTML
      */
 	public function DoControl(\Model\LoginHandler $loginHandler,
@@ -56,11 +55,15 @@ class LoginController {
                 // Loggar in användaren (hur inloggningen gick returneras)
                 $loginTry = $loginHandler->DoLogin($loginUsername, $loginPassword);
 
+                // Om användaren lyckats logga in körs nedan
 				if ($loginTry){
+                    // Om användaren kryssat i "Remember me" körs nedan
                     if ($loginView->RememberMe()){
                         
                         // Krypterar lösenordet och skapar cookies hos klienten.
                         $loginPassword = $encryptionHandler->Encrypt($loginPassword);
+
+                        // Skapar cookie med användaruppgifterna
                         $loginView->CreateCookie($loginUsername, $loginPassword);
 
                     }

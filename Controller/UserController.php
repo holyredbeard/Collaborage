@@ -3,13 +3,16 @@
 namespace Controller;
 
 require_once ('View/UserView.php');
+require_once('Common/PageView.php');
 
 class UserController {
 
 	private $_userIdArray = array();	// lagrar hämtade användar-ids
 	private $_userNameArray = array();	// lagrar hämtade användarnamn
 	
-	public function DoControl(\Model\UserHandler $userHandler, \View\UserView $userView, \Common\PageView $pageView) {
+	public function DoControl(\Model\UserHandler $userHandler,
+							  \View\UserView $userView,
+							  \Common\PageView $pageView) {
 
 		$xhtml = "";
 		$userArray = array();
@@ -23,11 +26,9 @@ class UserController {
 
 				// Visar meddelanden för användaren om hur det gick
 				if ($removeTry) {
-
 					$xhtml = \View\UserView::USER_REMOVED;
 				}
 				else {
-
 					$xhtml = \View\UserView::FAILED_TO_REMOVE_USER;
 				}
 			}
@@ -36,9 +37,10 @@ class UserController {
 		// Hämtar användarna igen och visar för användaren
 		$userArray = $userHandler->GetAllUsers();
 
-		$title = 'List of users';
-		$pageView->setTitle($title);
+		// Hämtar och sätter sidans titel
+		$pageView->setTitle(\Common\PageView::USER_LIST);
 
+		// Visar användarna
 		$xhtml .= $userView->ShowUsers($userArray);
 
 		return $xhtml;
